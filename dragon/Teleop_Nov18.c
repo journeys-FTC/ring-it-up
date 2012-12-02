@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
-#include "AvoidWierd.h"
+#include "..\includes\AvoidWierd.h"
 
 //***********************************************************//
 //                       Variables                           //
