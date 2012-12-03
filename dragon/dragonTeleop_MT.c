@@ -99,8 +99,8 @@ task main()
     getJoystickSettings(joystick);
     int cont1_left_yval = avoidWeird(joystick.joy1_y1, 20); //y coordinate for the left joystick on controller 1
     int cont1_left_xval = avoidWeird(joystick.joy1_x1, 75); //x coordinate for the left joystick on controller 1
-    int cont1_right_yval = avoidWeird(joystick.joy2_y2, 20);
-    int cont1_dPad = joystick.joy2_TopHat; //Value of the dPad for controller 2
+    int cont1_right_yval = avoidWeird(joystick.joy1_y2, 20);
+    int cont1_dPad = joystick.joy1_TopHat; //Value of the dPad for controller 2
 
     drive(cont1_left_yval, cont1_left_xval);
     shoulderMovement(cont1_right_yval);

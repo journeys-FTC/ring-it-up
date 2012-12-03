@@ -23,12 +23,12 @@ task main()
 
 	moveStraight (-50,500);
 	move (50,-50,375);
-	movearm (75,700);
-	movehand (160);
-	movearm (75,600);
-	movehand (110);
+	moveArm (75,700);
+	moveHand (160);
+	moveArm (75,600);
+	moveHand (110);
 	moveStraight (-30,1400);
-	movearm (75,700);
+	moveArm (75,700);
 
   while (true)
   {}
