@@ -22,12 +22,12 @@ task main()
 	waitForStart();
 
 	moveStraight (-50,500);
-	move (50,-50,373);
+	move (50,-50,375);
 	movearm (75,700);
 	movehand (160);
 	movearm (75,600);
 	movehand (110);
-	moveStraight (-30,1480);
+	moveStraight (-30,1400);
 	movearm (75,700);
 
   while (true)
