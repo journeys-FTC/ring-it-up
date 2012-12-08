@@ -154,7 +154,7 @@ task main()
     		servo[handJoint] = ServoValue[handJoint] - 5;
     	}
   	}
-  	if (joy1Btn(3) == 1)
+  	/*if (joy1Btn(3) == 1)
   	{
   		if (isSwitchFront)
   		{
@@ -164,7 +164,7 @@ task main()
   		{
   			isSwitchFront = true;
   		}
-  	}
+  	}*/
   	if (joy2Btn(1) == 1)
   	{
   		servo[ramp] = 0;
