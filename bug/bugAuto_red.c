@@ -21,7 +21,22 @@ task main()
 {
 	waitForStart();
 
-	moveStraight(50,1630);
+	moveStraight(50,170);
+	move(50,-50,430);
+	moveArm(-75,700);
+	moveHand(160);
+	moveArm(-75,800);
+	moveHand(140);
+	moveStraight(30,1550);
+	moveArm(-75,700);
+	wait1Msec(1000);
+	moveStraight(-30,400);
+	move(50,-50,430);
+	moveStraight(-50,800);
+
+
+
+	/*moveStraight(50,1630);
 	move(-50,50,390);
 	moveArm(-75,700);
 	moveHand(160);
@@ -33,7 +48,7 @@ task main()
 	moveStraight(-30,500);
 	move(50,-50,500);
 	moveStraight(-30,1650);
-	moveArm(75,2000);
+	moveArm(75,2000);*/
 
 	while (true)
 	{}

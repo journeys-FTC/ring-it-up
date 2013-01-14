@@ -34,11 +34,10 @@ int minHandValue = 20;
 //                         Methods                           //
 //***********************************************************//
 
-void drive(int ycord,int xcord, bool isSwitchFront)
+void drive(int ycord,int xcord, int maxVal, bool isSwitchFront)
 {
 	if (isSwitchFront)
 	{
-		int maxVal = 40;
   	int turningVal = -returnValueMotor(xcord, maxVal);
   	int motorVal = -returnValueMotor(ycord, maxVal);
 
@@ -50,7 +49,6 @@ void drive(int ycord,int xcord, bool isSwitchFront)
 	}
 	else
 	{
-  	int maxVal = 40;
   	int turningVal = returnValueMotor(xcord, maxVal);
   	int motorVal = returnValueMotor(ycord, maxVal);
 
@@ -179,7 +177,7 @@ task main()
   	}
 
 
-    drive(cont1_left_yval, cont1_left_xval, isSwitchFront);
+    drive(cont1_left_yval, cont1_left_xval, 40, isSwitchFront);
     shoulderMovement(cont2_right_yval, isSwitchFront);
     handMovement(cont2_dPad);
   }
