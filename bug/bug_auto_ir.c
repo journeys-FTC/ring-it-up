@@ -150,7 +150,7 @@ task main()
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
 			moveStraight (-50,1900);
-			move (50,-50,440);
+			move (50,-50,430);
 			movearm (75,700);
 			movehand (160);
 			movearm (75,700);
