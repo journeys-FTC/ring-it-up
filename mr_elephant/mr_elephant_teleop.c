@@ -29,8 +29,8 @@ task main()
 		int cont1_left_xval = avoidWeird(joystick.joy1_x1,75);
 		int cont1_right_yval = avoidWeird(joystick.joy1_y2,20);
 		int cont1_right_xval = avoidWeird(joystick.joy1_x2,50);
-		drive(cont1_left_yval, cont1_left_xval,40);
-		drive(cont1_right_yval, cont1_right_xval,100);
+		drive(cont1_left_yval, cont1_left_xval,100);
+		drive(cont1_right_yval, cont1_right_xval,60);
 
 		//arm functions
 		if(joy1Btn(8)==1)
