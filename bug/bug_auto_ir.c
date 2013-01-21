@@ -1,4 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
@@ -6,8 +7,8 @@
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
-#pragma config(Servo,  srvo_S1_C4_2,    handJoint,            tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
@@ -45,7 +46,7 @@
 
 void initializeRobot()
 {
-	/*
+/*
 	eraseDisplay();
 	string print;
 	int n = 0;
@@ -55,7 +56,7 @@ void initializeRobot()
 	wait10Msec(10);
 	n = n + 1;
 	}
-	*/
+*/
 	return;
 
 }

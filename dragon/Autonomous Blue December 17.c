@@ -138,37 +138,39 @@ task main()
 		{
 			//...turn left.
 			moveStraight (-50,115);
-			move (50,-50,456);
+			move (50,-50,466);
 			movearm (75,700);
 			movehand (160);
 			movearm (75,600);
 			movehand (110);
-			moveStraight (-30,1850);
+			wait10Msec (10);
+			moveStraight (-30,1790);
 			movearm (75,750);
 			moveStraight (50, 1000);
 		}
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
-			moveStraight (-50,1900);
-			move (50,-50,440);
+			moveStraight (-50,1805);
+			move (50,-50,435);
 			movearm (75,700);
 			movehand (160);
 			movearm (75,600);
 			movehand (110);
-			moveStraight (-30,450);
+			wait10Msec (100);
+			moveStraight (-30,376);
 			movearm (75,800);
 			moveStraight (50,200);
 		}
 		else if(SensorValue[IRSeeker] == 6)	//middle
 		{
-			moveStraight (-50,860);
-			move (50,-50,421);
+			moveStraight (-50,842);
+			move (50,-50,427);
 			movearm (75,700);
 			movehand (160);
 			movearm (75,600);
 			movehand (110);
-			moveStraight (-30,1350);
-			movearm (75,850);
+			moveStraight (-30,1185);
+			movearm (75,835);
 			moveStraight (50,1400);
 		}
 	}
