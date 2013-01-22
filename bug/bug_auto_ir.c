@@ -1,7 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
@@ -138,40 +138,44 @@ task main()
 		if(SensorValue[IRSeeker] == 7)	//right
 		{
 			//...turn left.
-			moveStraight (-50,115);
+			moveStraight (-50,107);
 			move (50,-50,456);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (160);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (130);
 			moveStraight (-30,1900);
-			movearm (75,750);
+			movearm (-75,750);
 			moveStraight (50, 1000);
 		}
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
-			moveStraight (-50,1900);
+			moveStraight (-50,1850);
 			move (50,-50,430);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (160);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (130);
 			moveStraight (-30,450);
-			movearm (75,800);
+			movearm (-75,800);
 			moveStraight (50,200);
 		}
 		else if(SensorValue[IRSeeker] == 6)	//middle
 		{
 			moveStraight (-50,800);
 			move (50,-50,421);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (160);
-			movearm (75,700);
+			movearm (-75,700);
 			movehand (130);
 			moveStraight (-30,1350);
-			movearm (75,850);
+			movearm (-75,850);
 			moveStraight (50,1400);
 		}
+		motor[shoulderJoint] = 40;
+		wait1Msec(1300);
+		servo[handJoint] = 60;
+		wait1Msec(350);
 	}
 	while (true)
 	{

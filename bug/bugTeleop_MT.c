@@ -6,9 +6,9 @@
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop, reversed)
-#pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
-#pragma config(Servo,  srvo_S1_C4_2,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C4_3,    ramp,                 tServoContinuousRotation)
+#pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_2,    ramp,                 tServoContinuousRotation)
+#pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_6,    servo6,               tServoNone)
@@ -29,6 +29,7 @@
 
 int maxHandValue = 250;
 int minHandValue = 20;
+
 
 //***********************************************************//
 //                         Methods                           //
@@ -103,19 +104,40 @@ void handMovement(int dPad)
 
 	if (dPad == 0)
 	{
-		if ((currentPosition + 1) < maxHandValue)
+		if ((currentPosition + 5) < maxHandValue)
 		{
-			newPosition = currentPosition + 1;
+			newPosition = currentPosition + 5;
 		}
 	}
 	else if (dPad == 4)
 	{
-		if ((currentPosition - 1) > minHandValue)
+		if ((currentPosition - 5) > minHandValue)
 		{
-			newPosition = currentPosition - 1;
+			newPosition = currentPosition - 5;
 		}
 	}
 	servo[handJoint] = newPosition;
+}
+
+void fold_arm(bool isDown)
+{
+	if (isDown)
+	{
+		motor[shoulderJoint] = 40;
+		wait1Msec(1300);
+		servo[handJoint] = 60;
+		wait1Msec(350);
+		return;
+	}
+	else
+	{
+		motor[shoulderJoint] = -40;
+		wait1Msec(700);
+		servo[handJoint] = 160;
+		motor[shoulderJoint] = -40;
+		wait1Msec(900);
+		return;
+	}
 }
 
 //***********************************************************//
@@ -126,6 +148,7 @@ task main()
 {
 	bool isSwitchFront = false;
   waitForStart();
+  servoChangeRate[handJoint] = 10;
 
   while (true)
   {
@@ -138,7 +161,6 @@ task main()
 
     if (joy1Btn(4) == 1)
     {
-    	servoChangeRate[handJoint] = 10;
     	if ((ServoValue[handJoint] + 5) < maxHandValue)
     	{
     		servo[handJoint] = ServoValue[handJoint] + 5;
@@ -146,12 +168,20 @@ task main()
     }
     if (joy1Btn(2) == 1)
     {
-    	servoChangeRate[handJoint] = 10;
     	if ((ServoValue[handJoint] - 5) > minHandValue)
     	{
     		servo[handJoint] = ServoValue[handJoint] - 5;
     	}
   	}
+  	if (joy1Btn(6) == 1)
+  	{
+  		fold_arm(false);
+  	}
+  	if (joy1Btn(5) == 1)
+  	{
+  		fold_arm(true);
+  	}
+
   	/*if (joy1Btn(3) == 1)
   	{
   		if (isSwitchFront)
