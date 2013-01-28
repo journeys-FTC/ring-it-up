@@ -33,7 +33,15 @@ int minHandValue = 20;
 //***********************************************************//
 //                         Methods                           //
 //***********************************************************//
-
+void all_stop()
+{
+	motor[leftFrontPair] = 0;
+	motor[leftRear] = 0;
+	motor[rightFrontPair] = 0;
+	motor[rightRear] = 0;
+	motor[shoulderJoint] = 0;
+	servo[ramp] = 128;
+}
 void drive(int ycord,int xcord)
 {
 	int maxVal = 40;
@@ -85,6 +93,28 @@ void handMovement(int dPad)
 	}
 	servo[handJoint] = newPosition;
 }
+void fold_arm(bool isDown)
+{
+	//all_stop();
+	if (isDown)
+	{
+		motor[shoulderJoint] = 40;
+		wait1Msec(1300);
+		servo[handJoint] = 260;
+		wait1Msec(350);
+		return;
+	}
+	else
+	{
+		motor[shoulderJoint] = -40;
+		wait1Msec(700);
+		servo[handJoint] = 100;
+		motor[shoulderJoint] = -40;
+		wait1Msec(900);
+		return;
+	}
+}
+
 
 //***********************************************************//
 //                      User Control                         //
@@ -127,6 +157,14 @@ task main()
 		if (joy2Btn(6) != 1 && joy2Btn(8) != 1)
 		{
 			servo[Ramp] = 128;
+		}
+		if (joy1Btn(6) == 1)
+		{
+			fold_arm(false);
+		}
+		if (joy1Btn(5) == 1)
+		{
+			fold_arm(true);
 		}
 	}
 }

@@ -35,6 +35,16 @@ int minHandValue = 20;
 //                         Methods                           //
 //***********************************************************//
 
+void all_stop()
+{
+	motor[leftFrontPair] = 0;
+	motor[leftRear] = 0;
+	motor[rightFrontPair] = 0;
+	motor[rightRear] = 0;
+	motor[shoulderJoint] = 0;
+	servo[ramp] = 128;
+}
+
 void drive(int ycord,int xcord, int maxVal, bool isSwitchFront)
 {
 	if (isSwitchFront)
@@ -121,6 +131,7 @@ void handMovement(int dPad)
 
 void fold_arm(bool isDown)
 {
+	all_stop();
 	if (isDown)
 	{
 		motor[shoulderJoint] = 40;

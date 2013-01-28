@@ -46,7 +46,7 @@
 
 void initializeRobot()
 {
-/*
+	/*
 	eraseDisplay();
 	string print;
 	int n = 0;
@@ -56,7 +56,7 @@ void initializeRobot()
 	wait10Msec(10);
 	n = n + 1;
 	}
-*/
+	*/
 	return;
 
 }
@@ -119,6 +119,15 @@ void movehand (int position)
 	servo[handJoint] = position;
 }
 
+void pack_hand()
+{
+	motor[shoulderJoint] = 40;
+	wait1Msec(1400);
+	servo[handJoint] = 60;
+	wait1Msec(350);
+	motor[shoulderJoint] = 0;
+}
+
 void allStop()
 {
 	motor[rightRear] = 0;
@@ -138,15 +147,21 @@ task main()
 		if(SensorValue[IRSeeker] == 7)	//right
 		{
 			//...turn left.
-			moveStraight (-50,107);
-			move (50,-50,456);
+			moveStraight (-50,110);
+			move (50,-50,450);
 			movearm (-75,700);
 			movehand (160);
 			movearm (-75,700);
 			movehand (130);
-			moveStraight (-30,1900);
+			moveStraight (-20,2200);
 			movearm (-75,750);
-			moveStraight (50, 1000);
+			moveStraight (50, 800);
+			pack_hand();
+			move(50,-50,450);
+			moveStraight(50,1000);
+			move(50,-50,450);
+			moveStraight(50,500);
+			move(-50,50,750);
 		}
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
@@ -156,9 +171,15 @@ task main()
 			movehand (160);
 			movearm (-75,700);
 			movehand (130);
-			moveStraight (-30,450);
+			moveStraight (-20,750);
 			movearm (-75,800);
 			moveStraight (50,200);
+			pack_hand();
+			move(50,-50,450);
+			moveStraight(50,500);
+			move(50,-50,450);
+			moveStraight(50,300);
+			move(-50,50,750);
 		}
 		else if(SensorValue[IRSeeker] == 6)	//middle
 		{
@@ -168,14 +189,11 @@ task main()
 			movehand (160);
 			movearm (-75,700);
 			movehand (130);
-			moveStraight (-30,1350);
+			moveStraight (-20,1650);
 			movearm (-75,850);
 			moveStraight (50,1400);
+			pack_hand();
 		}
-		motor[shoulderJoint] = 40;
-		wait1Msec(1300);
-		servo[handJoint] = 60;
-		wait1Msec(350);
 	}
 	while (true)
 	{
