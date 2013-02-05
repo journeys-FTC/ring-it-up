@@ -1,5 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
@@ -18,7 +18,7 @@
 //
 //                           Autonomous Mode Code Template
 //
-// This file contains a template for simplified creation of an autonomous program for an TETRIX robot
+// This file contains a template for simplified creation of an autonomous program for an Tetrix robot
 // competition.
 //
 // You need to customize two functions with code unique to your specific robot.
@@ -45,19 +45,10 @@
 
 void initializeRobot()
 {
-	/*
-	eraseDisplay();
-	string print;
-	int n = 0;
-	while (n<400){
-	print = SensorValue[IRSeeker];
-	nxtDisplayCenteredTextLine(0,print);
-	wait10Msec(10);
-	n = n + 1;
-	}
-	*/
-	return;
+  // Place code here to sinitialize servos to starting positions.
+  // Sensors are automatically configured and setup by ROBOTC. They may need a brief time to stabilize.
 
+  return;
 }
 
 
@@ -81,6 +72,7 @@ void initializeRobot()
 // At the end of the autonomous period, the FMS will autonmatically abort (stop) execution of the program.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void moveStraight(int power, int duration)
 {
 	motor[rightRear] = power;
@@ -130,66 +122,23 @@ void allStop()
 
 task main()
 {
-	initializeRobot();
-	waitForStart(); // Wait for the beginning of autonomous phase.
-	{
+  initializeRobot();
 
-		if(SensorValue[IRSeeker] == 7)	//right
-		{
-			//...turn left
-		moveStraight (-50,115);
-		move (50,-50,466);
-		movearm (75,700);
-		movehand (160);
-		movearm (75,600);
-		movehand (110);
-		wait10Msec (10);
-		moveStraight (-15,2700);
-		movearm (75,750);
-		moveStraight (50, 1000);
-		movearm (-40,1300);
-		movehand (150);
-		movearm (-40,900);
-		}
-		else if(SensorValue[IRSeeker] <= 5)	//left
-		{
-			moveStraight (-50,1755);
-			move (50,-50,429);
-			movearm (75,700);
-			movehand (160);
-			movearm (75,600);
-			movehand (110);
-			wait10Msec (100);
-			moveStraight (-30,368);
-			movearm (75,725);
-			moveStraight (50,200);
-			move (50,-50,300);
-			movearm (-40,1300);
-			movehand (150);
-			movearm (-40,900);
-		}
-		else if(SensorValue[IRSeeker] == 6)	//middle
-		{
-			moveStraight (-50,810);
-			move (50,-50,422);
-			movearm (75,700);
-			movehand (160);
-			movearm (75,600);
-			movehand (110);
-			wait10Msec (100);
-			moveStraight (-15,2030);
-			movearm (75,735);
-			moveStraight (50,400);
-			move (50,-50,600);
-			movearm (-40,1300);
-			movehand (240);
-			movearm (-40,900);
-			moveStraight (50,200);
+  waitForStart(); // Wait for the beginning of autonomous phase.
 
-		}
-	}
-	while (true)
-	{
-		return;
-	}
+  ///////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////
+  ////                                                   ////
+  ////    Add your robot specific autonomous code here.  ////
+  ////                                                   ////
+  ///////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////
+
+  waitForStart();
+{
+	moveStraight (-50,2050);
+}
+
+  while (true)
+  {}
 }
