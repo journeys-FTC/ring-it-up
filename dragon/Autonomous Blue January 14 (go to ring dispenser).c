@@ -137,6 +137,7 @@ task main()
 		if(SensorValue[IRSeeker] == 7)	//right
 		{
 			//...turn left.
+
 			moveStraight (-50,115);
 			move (50,-50,481);
 			movearm (75,700);

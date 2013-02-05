@@ -1,7 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
@@ -119,15 +118,6 @@ void movehand (int position)
 	servo[handJoint] = position;
 }
 
-void pack_hand()
-{
-	motor[shoulderJoint] = 40;
-	wait1Msec(1600);
-	servo[handJoint] = 60;
-	wait1Msec(350);
-	motor[shoulderJoint] = 0;
-}
-
 void allStop()
 {
 	motor[rightRear] = 0;
@@ -144,60 +134,18 @@ task main()
 	waitForStart(); // Wait for the beginning of autonomous phase.
 	{
 
-		if(SensorValue[IRSeeker] == 7)	//right
+		if(SensorValue[IRSeeker] >= 7)	//right
 		{
-			//...turn left.
-			moveStraight (-50,110);
-			move (50,-50,450);
-			movearm (-75,700);
-			movehand (160);
-			movearm (-75,700);
-			movehand (130);
-			moveStraight (-20,2200);
-			movearm (-75,750);
-			moveStraight (50, 800);
-			pack_hand();
-			move(-50,50,450);
-			moveStraight(50,300);
-			move(-50,50,450);
-			moveStraight(50,500);
-			move(50,-50,750);
+			//...turn left
+		moveStraight (-50,2015);
 		}
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
-			moveStraight (-50,1850);
-			move (50,-50,430);
-			movearm (-75,700);
-			movehand (160);
-			movearm (-75,700);
-			movehand (130);
-			moveStraight (-20,750);
-			movearm (-75,800);
-			moveStraight (50,200);
-			pack_hand();
-			move(-50,50,450);
-			moveStraight(50,1200);
-			move(-50,50,450);
-			moveStraight(50,700);
-			move(50,-50,650);
+			moveStraight (-50,2015);
 		}
 		else if(SensorValue[IRSeeker] == 6)	//middle
 		{
-			moveStraight (-50,800);
-			move (50,-50,418);
-			movearm (-75,700);
-			movehand (160);
-			movearm (-75,700);
-			movehand (130);
-			moveStraight (-20,1650);
-			movearm (-75,850);
-			moveStraight (50,1000);
-			pack_hand();
-			move(-50,50,450);
-			moveStraight(50,500);
-			move(-50,50,750);
-			moveStraight(50,800);
-			move(50,-50,450);
+			moveStraight (-50,2015);
 		}
 	}
 	while (true)

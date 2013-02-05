@@ -160,6 +160,7 @@ task main()
 	bool isSwitchFront = false;
   waitForStart();
   servoChangeRate[handJoint] = 10;
+  int maxVal = 40;
 
   while (true)
   {
@@ -193,6 +194,16 @@ task main()
   		fold_arm(true);
   	}
 
+  	if (joy1Btn(1) == 1)
+  	{
+  		maxVal = 100;
+  	}
+
+  	if (joy1Btn(1) != 1)
+  	{
+  		maxVal = 40;
+  	}
+
   	/*if (joy1Btn(3) == 1)
   	{
   		if (isSwitchFront)
@@ -218,7 +229,7 @@ task main()
   	}
 
 
-    drive(cont1_left_yval, cont1_left_xval, 40, isSwitchFront);
+    drive(cont1_left_yval, cont1_left_xval, maxVal, isSwitchFront);
     shoulderMovement(cont2_right_yval, isSwitchFront);
     handMovement(cont2_dPad);
   }
