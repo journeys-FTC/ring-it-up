@@ -1,11 +1,11 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     motorE,        tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     verticalLift,  tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_2,    ramp,                 tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
@@ -42,19 +42,19 @@ void all_stop()
 	motor[rightFrontPair] = 0;
 	motor[rightRear] = 0;
 	motor[shoulderJoint] = 0;
-	servo[ramp] = 128;
+	motor[verticalLift] = 0;
 }
 
-void drive(int ycord,int xcord, int maxVal)
+void drive(int ycord, int xcord, int maxVal)
 {
 	int turningVal = returnValueMotor(xcord, maxVal);
-	int motorVal = returnValueMotor(ycord, maxVal);dew
+	int motorVal = returnValueMotor(ycord, maxVal);
 
-	motor[leftRear] = motorVal + (2*turningVal);
-	motor[leftFrontPair] = motorVal + (2*turningVal);
-
-	motor[rightRear] = motorVal - (2*turningVal);
 	motor[rightFrontPair] = motorVal - (2*turningVal);
+	motor[rightRear] = motorVal - (2*turningVal);
+
+	motor[leftFrontPair] = motorVal + (2*turningVal);
+	motor[leftRear] = motorVal + (2*turningVal);
 }
 
 void shoulderMovement(int ycord)
@@ -62,28 +62,6 @@ void shoulderMovement(int ycord)
 	int maxVal = 40;
 	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
 	return;
-}
-
-void handMovement(int dPad)
-{
-	int currentPosition = ServoValue[handJoint];
-	int newPosition = currentPosition;
-
-	if (dPad == 0)
-	{
-		if ((currentPosition + 5) < maxHandValue)
-		{
-			newPosition = currentPosition + 5;
-		}
-	}
-	else if (dPad == 4)
-	{
-		if ((currentPosition - 5) > minHandValue)
-		{
-			newPosition = currentPosition - 5;
-		}
-	}
-	servo[handJoint] = newPosition;
 }
 
 void fold_arm(bool isDown)
@@ -108,6 +86,28 @@ void fold_arm(bool isDown)
 	}
 }
 
+void handMovement(int dPad)
+{
+	int currentPosition = ServoValue[handJoint];
+	int newPosition = currentPosition;
+
+	if (dPad == 0)
+	{
+		if ((currentPosition + 5) < maxHandValue)
+		{
+			newPosition = currentPosition + 5;
+		}
+	}
+	else if (dPad == 4)
+	{
+		if ((currentPosition - 5) > minHandValue)
+		{
+			newPosition = currentPosition - 5;
+		}
+	}
+	servo[handJoint] = newPosition;
+}
+
 //***********************************************************//
 //                      User Control                         //
 //***********************************************************//
@@ -116,7 +116,8 @@ task main()
 {
 	waitForStart();
 	servoChangeRate[handJoint] = 10;
-	int maxVal = 40;
+	int max_val_lift = 100;
+	int max_val_drive = 50;
 
 	while (true)
 	{
@@ -124,23 +125,25 @@ task main()
 
 		int cont1_left_yval = avoidWeird(joystick.joy1_y1, 20); //y coordinate for the left joystick on controller 1
 		int cont1_left_xval = avoidWeird(joystick.joy1_x1, 75); //x coordinate for the left joystick on controller 1
-		int cont1_right_yval = avoidWeird(joystick.joy1_y2, 20);
+		int cont1_right_yval = avoidWeird(joystick.joy1_y2, 20); //y coordinate for the right joystick on controller 1
+		int cont1_right_xval = avoidWeird(joystick.joy1_x2, 75); //x coordinate for the right joystick on controler 1
 		int cont1_dPad = joystick.joy1_TopHat; //Value of the dPad for controller 2
 
+		//Code for moving the vertical lift. The controls are buttons 2 and 4
 		if (joy1Btn(4) == 1)
 		{
-			if ((ServoValue[handJoint] + 5) < maxHandValue)
-			{
-				servo[handJoint] = ServoValue[handJoint] + 5;
-			}
+			motor[verticalLift] = max_val_lift;
 		}
 		if (joy1Btn(2) == 1)
 		{
-			if ((ServoValue[handJoint] - 5) > minHandValue)
-			{
-				servo[handJoint] = ServoValue[handJoint] - 5;
-			}
+			motor[verticalLift] = -max_val_lift;
 		}
+		if (joy1Btn(4) != 1 && joy1Btn(2) != 1)
+		{
+			motor[verticalLift] = 0;
+		}
+
+		//Code for folding and unfolding arm in quick subroutines
 		if (joy1Btn(6) == 1)
 		{
 			fold_arm(false);
@@ -150,30 +153,18 @@ task main()
 			fold_arm(true);
 		}
 
+		//Code for increasing the speed of the robot when button 1 is pressed
 		if (joy1Btn(1) == 1)
 		{
-			maxVal = 100;
+			max_val_drive = 100;
 		}
 
 		if (joy1Btn(1) != 1)
 		{
-			maxVal = 40;
+			max_val_drive = 40;
 		}
 
-		if (joy2Btn(1) == 1)
-		{
-			servo[ramp] = 0;
-		}
-		if (joy2Btn(3) == 1)
-		{
-			servo[ramp] = 255;
-		}
-		if (joy2Btn(1) != 1 && joy2Btn(3) != 1)
-		{
-			servo[ramp] = 128;
-		}
-
-		drive(cont1_left_yval, cont1_left_xval, maxVal);
+		drive(cont1_left_yval, cont1_left_xval, max_val_drive);
 		shoulderMovement(cont1_right_yval);
 		handMovement(cont1_dPad);
 	}
