@@ -48,7 +48,7 @@ void all_stop()
 void drive(int ycord,int xcord, int maxVal)
 {
 	int turningVal = returnValueMotor(xcord, maxVal);
-	int motorVal = returnValueMotor(ycord, maxVal);dew
+	int motorVal = returnValueMotor(ycord, maxVal);
 
 	motor[leftRear] = motorVal + (2*turningVal);
 	motor[leftFrontPair] = motorVal + (2*turningVal);

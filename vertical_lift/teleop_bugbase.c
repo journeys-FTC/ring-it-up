@@ -70,7 +70,7 @@ void fold_arm(bool isDown)
 	if (isDown)
 	{
 		motor[shoulderJoint] = 40;
-		wait1Msec(1300);
+		wait1Msec(1100);
 		servo[handJoint] = 60;
 		wait1Msec(350);
 		return;
@@ -79,7 +79,7 @@ void fold_arm(bool isDown)
 	{
 		motor[shoulderJoint] = -40;
 		wait1Msec(700);
-		servo[handJoint] = 160;
+		servo[handJoint] = 180;
 		motor[shoulderJoint] = -40;
 		wait1Msec(900);
 		return;
