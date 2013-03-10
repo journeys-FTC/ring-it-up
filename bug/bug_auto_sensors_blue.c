@@ -1,6 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
+#pragma config(Sensor, S3,     lightsensorRight, sensorLightActive)
+#pragma config(Sensor, S4,     lightsensorLeft, sensorLightActive)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
@@ -149,19 +150,9 @@ task main()
 			//...turn left.
 			moveStraight (-50,110);
 			move (50,-50,450);
-			movearm (-75,700);
-			movehand (160);
-			movearm (-75,700);
-			movehand (130);
-			moveStraight (-20,2200);
-			movearm (-75,750);
-			moveStraight (50, 800);
-			pack_hand();
-			move(50,-50,450);
-			moveStraight(50,1000);
-			move(50,-50,450);
-			moveStraight(50,500);
-			move(-50,50,750);
+
+			//Light sensor code
+			//
 		}
 		else if(SensorValue[IRSeeker] <= 5)	//left
 		{
