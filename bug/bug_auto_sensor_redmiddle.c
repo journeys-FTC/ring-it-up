@@ -1,6 +1,8 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop)
+#pragma config(Sensor, S3,     r_lightsensor,  sensorLightActive)
+#pragma config(Sensor, S4,     l_lightsensor,  sensorLightActive)
+#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
@@ -118,6 +120,15 @@ void movehand (int position)
 	servo[handJoint] = position;
 }
 
+void pack_hand()
+{
+	motor[shoulderJoint] = 40;
+	wait1Msec(1200);
+	servo[handJoint] = 60;
+	wait1Msec(350);
+	motor[shoulderJoint] = 0;
+}
+
 void allStop()
 {
 	motor[rightRear] = 0;
@@ -131,65 +142,104 @@ void allStop()
 task main()
 {
 	initializeRobot();
+	int previousCase = 0;
+	int bursts = 0;
+	bool isStraight = false;
 	waitForStart(); // Wait for the beginning of autonomous phase.
 	{
+		moveStraight (-50,650);
+		move (50,-50,500);
 
-		if(SensorValue[IRSeeker] == 7)	//right
-		{
-			//...turn left
-		moveStraight (-50,115);
-		move (50,-50,460);
-		movearm (75,700);
+		//Move forward until it the left sensor is not on the grey mat
+		while (SensorValue(l_lightsensor) < 32 && SensorValue(l_lightsensor) > 25){
+			moveStraight(-15,25);
+		}
+
+		moveStraight(-50,300);
+
+		while(bursts < 400){
+
+			if (SensorValue(l_lightsensor) > 32 && SensorValue(r_lightsensor) < 25){ //left sensor is white and right sensor is black
+				moveStraight(-20,10);
+				previousCase = 1;
+				isStraight = true;
+			}
+			else if (SensorValue(l_lightsensor) < 25 && SensorValue(r_lightsensor) > 32){ //left sensor is black and right sensor is white
+				moveStraight(-20,10);
+				previousCase = 2;
+				isStraight = true;
+			}
+			else{
+				if (previousCase == 1){
+					move(-25,25,10);
+				}
+				else
+				{
+					move(25,-25,10);
+				}
+			}
+
+			if (isStraight) {
+				bursts += 4;
+			}
+			else {
+				bursts += 1;
+			}
+			isStraight = false;
+		}
+
+		bursts = 0;
+
+		while(bursts < 380){
+
+			if (SensorValue(l_lightsensor) > 32 && SensorValue(r_lightsensor) < 25){ //left sensor is white and right sensor is black
+				moveStraight(20,10);
+				previousCase = 1;
+				isStraight = true;
+			}
+			else if (SensorValue(l_lightsensor) < 25 && SensorValue(r_lightsensor) > 32){ //left sensor is black and right sensor is white
+				moveStraight(20,10);
+				previousCase = 2;
+				isStraight = true;
+			}
+			else{
+				if (previousCase == 1){
+					move(-20,20,10);
+				}
+				else
+				{
+					move(20,-20,10);
+				}
+			}
+
+			if (isStraight) {
+				bursts += 4;
+			}
+
+			else {
+				bursts += 1;
+			}
+			isStraight = false;
+		}
+
+		movearm (-75,700);
 		movehand (160);
-		movearm (75,600);
-		movehand (110);
-		wait10Msec (10);
-		moveStraight (-15,2700);
-		movearm (75,750);
-		moveStraight (50, 1000);
-		movearm (-40,1300);
-		movehand (150);
-		movearm (-40,900);
-		}
-		else if(SensorValue[IRSeeker] <= 5)	//left
-		{
-			moveStraight (-50,1755);
-			move (50,-50,429);
-			movearm (75,700);
-			movehand (160);
-			movearm (75,600);
-			movehand (110);
-			wait10Msec (100);
-			moveStraight (-30,368);
-			movearm (75,725);
-			moveStraight (50,200);
-			move (50,-50,300);
-			movearm (-40,1300);
-			movehand (150);
-			movearm (-40,900);
-		}
-		else if(SensorValue[IRSeeker] == 6)	//middle
-		{
-			moveStraight (-50,790);//Was 810
-			move (50,-50,412);
-			movearm (75,700);
-			movehand (160);
-			movearm (75,600);
-			movehand (110);
-			wait10Msec (100);
-			moveStraight (-15,1970);//was 2030
-			movearm (75,735);
-			moveStraight (50,400);
-			move (-50,50,600);
-			movearm (-40,1300);
-			movehand (240);
-			movearm (-40,900);
-			moveStraight (50,200);
+		movearm (-75,500);
+		movehand (130);
 
-		}
+		moveStraight(-20,400);
+		movearm(-75,400);
+		wait1Msec(200);
+		moveStraight(20,400);
+		movearm(75,400);
+
+		moveStraight (-20,800);
+		movearm (-75,850);
+		moveStraight (50,1000);
+		pack_hand();
+
 	}
-	while (true)
-	{
+	while (true){
 		return;
 	}
 }
