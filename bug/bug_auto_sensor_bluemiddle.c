@@ -29,6 +29,14 @@
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//																		Global Variables
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int black_threshold = 23;
+int white_threshold = 37;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -147,11 +155,11 @@ task main()
 	bool isStraight = false;
 	waitForStart(); // Wait for the beginning of autonomous phase.
 	{
-		moveStraight (-50,650);
-		move (-50,50,500);
+		moveStraight (-50,680);
+		move (-50,50,450);
 
 		//Move forward until it the left sensor is not on the grey mat
-		while (SensorValue(l_lightsensor) < 32 && SensorValue(l_lightsensor) > 25){
+		while (SensorValue(l_lightsensor) < white_threshold && SensorValue(l_lightsensor) > black_threshold){
 			moveStraight(-15,25);
 		}
 
@@ -159,12 +167,12 @@ task main()
 
 		while(bursts < 400){
 
-			if (SensorValue(l_lightsensor) > 32 && SensorValue(r_lightsensor) < 25){ //left sensor is white and right sensor is black
+			if (SensorValue(l_lightsensor) > white_threshold && SensorValue(r_lightsensor) < black_threshold){ //left sensor is white and right sensor is black
 				moveStraight(-20,10);
 				previousCase = 1;
 				isStraight = true;
 			}
-			else if (SensorValue(l_lightsensor) < 25 && SensorValue(r_lightsensor) > 32){ //left sensor is black and right sensor is white
+			else if (SensorValue(l_lightsensor) < black_threshold && SensorValue(r_lightsensor) > white_threshold){ //left sensor is black and right sensor is white
 				moveStraight(-20,10);
 				previousCase = 2;
 				isStraight = true;
@@ -192,12 +200,12 @@ task main()
 
 		while(bursts < 380){
 
-			if (SensorValue(l_lightsensor) > 32 && SensorValue(r_lightsensor) < 25){ //left sensor is white and right sensor is black
+			if (SensorValue(l_lightsensor) > white_threshold && SensorValue(r_lightsensor) < black_threshold){ //left sensor is white and right sensor is black
 				moveStraight(20,10);
 				previousCase = 1;
 				isStraight = true;
 			}
-			else if (SensorValue(l_lightsensor) < 25 && SensorValue(r_lightsensor) > 32){ //left sensor is black and right sensor is white
+			else if (SensorValue(l_lightsensor) < black_threshold && SensorValue(r_lightsensor) > white_threshold){ //left sensor is black and right sensor is white
 				moveStraight(20,10);
 				previousCase = 2;
 				isStraight = true;
@@ -231,7 +239,13 @@ task main()
 		movearm(-75,400);
 		wait1Msec(200);
 		moveStraight(20,400);
-		movearm(75,400);
+		movearm(75,450);
+
+		moveStraight(-20,600);
+		movearm(-75,400);
+		wait1Msec(200);
+		moveStraight(20,600);
+		movearm(75,450);
 
 		moveStraight (-20,800);
 		movearm (-75,850);
