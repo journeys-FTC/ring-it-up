@@ -1,6 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     motorE,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop, reversed)
@@ -23,25 +23,20 @@
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
 #include "..\includes\AvoidWierd.h"
 
-//******************************************************************//
-//                       Global Variables                           //
-//******************************************************************//
+//***********************************************************//
+//                       Variables                           //
+//***********************************************************//
 
 int maxHandValue = 250;
-int minHandValue = 5;
-
-int scoringHand = 130;
-int packedHand = 40;
-
-int tempEncoder = 0;
-int currentEncoder = 0;
+int minHandValue = 50;
 
 
 //***********************************************************//
 //                         Methods                           //
 //***********************************************************//
 
-void all_stop(){
+void all_stop()
+{
 	motor[leftFrontPair] = 0;
 	motor[leftRear] = 0;
 	motor[rightFrontPair] = 0;
@@ -50,9 +45,8 @@ void all_stop(){
 	servo[ramp] = 128;
 }
 
-void drive(int ycord,int xcord, int maxVal){
-	// Controls the wheel speeds
-
+void drive(int ycord,int xcord, int maxVal)
+{
 	int turningVal = returnValueMotor(xcord, maxVal);
 	int motorVal = returnValueMotor(ycord, maxVal);
 
@@ -63,81 +57,54 @@ void drive(int ycord,int xcord, int maxVal){
 	motor[rightFrontPair] = motorVal - (2*turningVal);
 }
 
-void shoulderMovement(int ycord){
-	// Controls the movement of the shoulder joint
-
+void shoulderMovement(int ycord)
+{
 	int maxVal = 40;
 	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
-	currentEncoder = nMotorEncoder[shoulderJoint];
-	if (currentEncoder != tempEncoder){
-		writeDebugStreamLine("encoder current value: %d", currentEncoder);
-		tempEncoder = currentEncoder;
-	}
 	return;
 }
 
-void handMovement(int dPad){
-	// Use the dPad to control servo movement in the same way as buttons 2 and 4
-
+void handMovement(int dPad)
+{
 	int currentPosition = ServoValue[handJoint];
 	int newPosition = currentPosition;
 
-	if (dPad == 0){
-		if ((currentPosition + 5) < maxHandValue){
+	if (dPad == 0)
+	{
+		if ((currentPosition + 5) < maxHandValue)
+		{
 			newPosition = currentPosition + 5;
 		}
 	}
-
-	else if (dPad == 4){
-		if ((currentPosition - 5) > minHandValue){
+	else if (dPad == 4)
+	{
+		if ((currentPosition - 5) > minHandValue)
+		{
 			newPosition = currentPosition - 5;
 		}
 	}
-
 	servo[handJoint] = newPosition;
 }
 
-void fold_arm(bool isFold){
-	// if isFold is true, the arm will return to folded position
-	// otherwise it will deploy to scoring position
-
+void fold_arm(bool isFold)
+{
 	all_stop();
-	if (isFold){
-		servo[handJoint] = packedHand;
-		while (nMotorEncoder[shoulderJoint] < -500){
-			motor[shoulderJoint] = 30;
-		}
-		writeDebugStreamLine("arm is folded at: %d", nMotorEncoder[shoulderJoint]);
-		//motor[shoulderJoint] = 40;
-		//wait1Msec(1300);
-		//servo[handJoint] = 80;
-		//wait1Msec(350);
+	if (isFold)
+	{
+		motor[shoulderJoint] = 40;
+		wait1Msec(1300);
+		servo[handJoint] = 80;
+		wait1Msec(350);
 		return;
 	}
-	else{
-		while (nMotorEncoder[shoulderJoint] > -2300){
-			motor[shoulderJoint] = -30;
-		}
-		motor[shoulderJoint] = 0;
-		writeDebugStreamLine("arm is halfway at: %d", nMotorEncoder[shoulderJoint]);
-		servo[handJoint] = scoringHand;
-
-		//motor[shoulderJoint] = -40;
-		//wait1Msec(700);
-		//writeDebugStreamLine("encoder is at 1: %d", nMotorEncoder[shoulderJoint]);
-		//servo[handJoint] = 180;
-
-		while (nMotorEncoder[shoulderJoint] > -4900){
-			motor[shoulderJoint] = -30;
-		}
-		motor[shoulderJoint] = 0;
-		writeDebugStreamLine("arm is extended at: %d", nMotorEncoder[shoulderJoint]);
-
-
-		//motor[shoulderJoint] = -40;
-		//wait1Msec(900);
-		//writeDebugStreamLine("encoder is at 2: %d", nMotorEncoder[shoulderJoint]);
-		//return;
+	else
+	{
+		motor[shoulderJoint] = -40;
+		wait1Msec(700);
+		servo[handJoint] = 180;
+		motor[shoulderJoint] = -40;
+		wait1Msec(900);
+		return;
 	}
 }
 
@@ -148,13 +115,11 @@ void fold_arm(bool isFold){
 task main()
 {
 	waitForStart();
-	nMotorEncoder[shoulderJoint] = 0;
-	writeDebugStreamLine("encoder set to: %d", nMotorEncoder[shoulderJoint]);
 	servoChangeRate[handJoint] = 10;
 	int maxVal = 40;
 
-	while (true){
-
+	while (true)
+	{
 		getJoystickSettings(joystick);
 
 		int cont1_left_yval = avoidWeird(joystick.joy1_y1, 20); //y coordinate for the left joystick on controller 1
@@ -162,59 +127,51 @@ task main()
 		int cont1_right_yval = avoidWeird(joystick.joy1_y2, 20);
 		int cont1_dPad = joystick.joy1_TopHat; //Value of the dPad for controller 2
 
-		if (joy1Btn(4) == 1){
-			// Button 4 controls the wrist servo movement
-			if ((ServoValue[handJoint] + 5) < maxHandValue){
+		if (joy1Btn(4) == 1)
+		{
+			if ((ServoValue[handJoint] + 5) < maxHandValue)
+			{
 				servo[handJoint] = ServoValue[handJoint] + 5;
 			}
 		}
-
-		if (joy1Btn(2) == 1){
-			// Button 2 controls the wrist servo movement
-			if ((ServoValue[handJoint] - 5) > minHandValue){
+		if (joy1Btn(2) == 1)
+		{
+			if ((ServoValue[handJoint] - 5) > minHandValue)
+			{
 				servo[handJoint] = ServoValue[handJoint] - 5;
 			}
 		}
-
-		if (joy1Btn(6) == 1){
-			// Button 6 deploys the arm to scoring position
+		if (joy1Btn(6) == 1)
+		{
 			fold_arm(false);
 		}
-		if (joy1Btn(5) == 1){
-			// Button 5 folds the arm down
+		if (joy1Btn(5) == 1)
+		{
 			fold_arm(true);
 		}
 
-		if (joy1Btn(1) == 1){
-			// Holding button 1 while driving gives a speed boost
+		if (joy1Btn(1) == 1)
+		{
 			maxVal = 100;
 		}
 
-		if (joy1Btn(1) != 1){
-			// Anytime button 1 is not pressed, the speed is at 40
+		if (joy1Btn(1) != 1)
+		{
 			maxVal = 40;
 		}
 
-		if (joy1Btn(8) == 1){
-			// Button 8 resets the encoder value to 0
-			nMotorEncoder[shoulderJoint] = 0;
-			currentEncoder = nMotorEncoder[shoulderJoint];
-			tempEncoder = currentEncoder;
-			writeDebugStreamLine("encoder reset to: %d", currentEncoder);
+		if (joy2Btn(1) == 1)
+		{
+			servo[ramp] = 0;
 		}
-
-		//if (joy2Btn(1) == 1){
-		//	// Sets the ramp servo to deploy
-		//	servo[ramp] = 0;
-		//}
-		//if (joy2Btn(3) == 1){
-		//	// Sets the ramp servo to retract
-		//	servo[ramp] = 255;
-		//}
-		//if (joy2Btn(1) != 1 && joy2Btn(3) != 1){
-		//	// Sets the ramp servo to stopped
-		//	servo[ramp] = 128;
-		//}
+		if (joy2Btn(3) == 1)
+		{
+			servo[ramp] = 255;
+		}
+		if (joy2Btn(1) != 1 && joy2Btn(3) != 1)
+		{
+			servo[ramp] = 128;
+		}
 
 		drive(cont1_left_yval, cont1_left_xval, maxVal);
 		shoulderMovement(cont1_right_yval);
