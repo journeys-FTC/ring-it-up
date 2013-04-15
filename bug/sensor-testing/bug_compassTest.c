@@ -24,7 +24,7 @@
 //
 // Variables that will be used by the code from outside functions.
 // Global Variables:
-//		1. name: compassZero
+//		1. name: COMPASS_ZERO
 //			 description: the original direction the robot is facing at the start of a game
 //		   function: this will be utilized as the zero point for future reckonings as fields have a
 //			 		high probability of all facing different compass directions.
@@ -33,8 +33,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int compassZero;
-int currentHeading;
+int COMPASS_ZERO;
+int CURRENT_HEADING;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -59,16 +59,16 @@ void initializeRobot()
 	int i = 0;
   while (i < 400)
   {
-    compassZero = SensorValue[compass];
-    if (abs(compassZero - nOldHeading) > 1)
+    COMPASS_ZERO = SensorValue[compass];
+    if (abs(COMPASS_ZERO - nOldHeading) > 1)
     {
       // Only update when changed to avoid LCD screen flicker
-      nxtDisplayCenteredTextLine(0, "%d", compassZero);
-      nOldHeading = compassZero;
+      nxtDisplayCenteredTextLine(0, "%d", COMPASS_ZERO);
+      nOldHeading = COMPASS_ZERO;
     }
     i += 1;
   }
-  //compassZero = SensorValue[compass];
+  //COMPASS_ZERO = SensorValue[compass];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ int orientOnCurrentHeading (int cH, int heading){
 	// negative, and those to the right become positive.
 	//
 
-	// cH: currentHeading/the heading to be oriented around
+	// cH: CURRENT_HEADING/the heading to be oriented around
 	// heading: the heading to orient
 
 	if (cH <= 180){
@@ -210,26 +210,26 @@ void allStop()
 // Steps:
 //
 //		1. Determine the current heading
-//				a. The robot should have a compassZero which will become
+//				a. The robot should have a COMPASS_ZERO which will become
 //					 the current heading.
 //
 //		2. Follow the heading for some time
-//				a. The value of compassZero will be set to currentHeading
+//				a. The value of COMPASS_ZERO will be set to currentHeading
 //				b. The robot will move forward slowly, periodically checking
 //					 to ensure it remains on course. This course will be determined
-//					 by the value of currentHeading, though it will actually be a
-//					 range of potential values to follow: currentHeading +/- 5.
+//					 by the value of CURRENT_HEADING, though it will actually be a
+//					 range of potential values to follow: CURRENT_HEADING +/- 5.
 //					 In other words, the robot will continue forward so long as its
-//					 current sensor reading is equal to currentHeading +/- 5.
+//					 current sensor reading is equal to CURRENT_HEADING +/- 5.
 //
 //		3. Complete a 90 degree turn
 //				a. The motors will be powered such that the robot turns left
 //				b. This will continue periodically until the robot is facing
-//					 90 degrees from compassZero
+//					 90 degrees from COMPASS_ZERO
 //
 //		4. Follow new heading
-//				a. The heading 90 degrees from compassZero will be set to
-//					 currentHeading
+//				a. The heading 90 degrees from COMPASS_ZERO will be set to
+//					 CURRENT_HEADING
 //				b. The robot will move forward slowly, periodically checking
 //					 to ensure it remains on course.
 //
@@ -242,12 +242,12 @@ task main()
 	wait1Msec(100);
 
 	//
-	// Very first, the case in which the compass malfunctions and compassZero
+	// Very first, the case in which the compass malfunctions and COMPASS_ZERO
 	// has a value of -1 will be checked. In the case that it is -1, the program
 	// will terminate.
 	//
 
-	if (compassZero == -1){
+	if (COMPASS_ZERO == -1){
 
 		return;
 	}
@@ -257,7 +257,7 @@ task main()
 		//
 		// Determine current heading
 		//
-		currentHeading = compassZero;
+		CURRENT_HEADING = COMPASS_ZERO;
 
 		//
 		// Follow the heading
@@ -278,18 +278,18 @@ task main()
 			nCurrentHeading = SensorValue[compass];
 			nxtDisplayCenteredTextLine(0, "%d", nCurrentHeading);
 
-			if ((orientOnCurrentHeading(currentHeading, nCurrentHeading) > -5) && (orientOnCurrentHeading(currentHeading,nCurrentHeading) < 5)){
+			if ((orientOnCurrentHeading(CURRENT_HEADING, nCurrentHeading) > -5) && (orientOnCurrentHeading(CURRENT_HEADING,nCurrentHeading) < 5)){
 				// The case if the current sensor value falls within the correct range.
 				moveStraight(-20,20);
 				n += 5;
 			}
-			else if (orientOnCurrentHeading(currentHeading, nCurrentHeading) < 0){
+			else if (orientOnCurrentHeading(CURRENT_HEADING, nCurrentHeading) < 0){
 				// The case if the current sensor value is to the left of the correct range.
 				// i.e. the robot needs to turn to the right.
 				move(20,-20,10);
 				n += 1;
 			}
-			else if (orientOnCurrentHeading(currentHeading, nCurrentHeading) > 0){
+			else if (orientOnCurrentHeading(CURRENT_HEADING, nCurrentHeading) > 0){
 				// The case if the current sensor value is to the right of the correct range.
 				// i.e. the robot needs to turn to the left.
 				move(-20,20,10);
@@ -318,15 +318,15 @@ task main()
 		//
 
 		int turnAngle = -90;
-		int mGoalHeading = conversionHelper(currentHeading + turnAngle);
+		int mGoalHeading = conversionHelper(CURRENT_HEADING + turnAngle);
 		int mCurrentHeading = SensorValue[compass];
 
 		int vmCurrentHeading;
-		int vmGoalHeading = orientOnCurrentHeading(currentHeading,mGoalHeading);
+		int vmGoalHeading = orientOnCurrentHeading(CURRENT_HEADING,mGoalHeading);
 
 		while ((orientOnCurrentHeading(mGoalHeading, mCurrentHeading) < 0) || (orientOnCurrentHeading(mGoalHeading, mCurrentHeading) > 10)){
 			nxtDisplayCenteredTextLine(0, "%d", mCurrentHeading);
-			vmCurrentHeading = orientOnCurrentHeading(currentHeading,mCurrentHeading);
+			vmCurrentHeading = orientOnCurrentHeading(CURRENT_HEADING,mCurrentHeading);
 
 			int mDuration = abs((vmGoalHeading-vmCurrentHeading)/5);
 			if (mDuration < 5){

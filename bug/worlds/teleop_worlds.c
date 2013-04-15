@@ -1,6 +1,6 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     motorE,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop, reversed)
@@ -66,7 +66,7 @@ void drive(int ycord,int xcord, int maxVal){
 void shoulderMovement(int ycord){
 	// Controls the movement of the shoulder joint
 
-	int maxVal = 40;
+	int maxVal = 30;
 	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
 	currentEncoder = nMotorEncoder[shoulderJoint];
 	if (currentEncoder != tempEncoder){
@@ -148,6 +148,8 @@ void fold_arm(bool isFold){
 task main()
 {
 	waitForStart();
+	bFloatDuringInactiveMotorPWM = false;
+
 	nMotorEncoder[shoulderJoint] = 0;
 	writeDebugStreamLine("encoder set to: %d", nMotorEncoder[shoulderJoint]);
 	servoChangeRate[handJoint] = 10;
