@@ -7,7 +7,7 @@
 #pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C4_2,    ramp,                 tServoContinuousRotation)
+#pragma config(Servo,  srvo_S1_C4_2,    irServo,              tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
@@ -47,7 +47,6 @@ void all_stop(){
 	motor[rightFrontPair] = 0;
 	motor[rightRear] = 0;
 	motor[shoulderJoint] = 0;
-	servo[ramp] = 128;
 }
 
 void drive(int ycord,int xcord, int maxVal){
@@ -104,9 +103,10 @@ void fold_arm(bool isFold){
 	all_stop();
 	if (isFold){
 		servo[handJoint] = packedHand;
-		while (nMotorEncoder[shoulderJoint] < -500){
+		while (nMotorEncoder[shoulderJoint] > 500){
 			motor[shoulderJoint] = 30;
 		}
+		motor[shoulderJoint] = 0;
 		writeDebugStreamLine("arm is folded at: %d", nMotorEncoder[shoulderJoint]);
 		//motor[shoulderJoint] = 40;
 		//wait1Msec(1300);
@@ -115,7 +115,7 @@ void fold_arm(bool isFold){
 		return;
 	}
 	else{
-		while (nMotorEncoder[shoulderJoint] > -2300){
+		while (nMotorEncoder[shoulderJoint] < 2300){
 			motor[shoulderJoint] = -30;
 		}
 		motor[shoulderJoint] = 0;
@@ -127,7 +127,7 @@ void fold_arm(bool isFold){
 		//writeDebugStreamLine("encoder is at 1: %d", nMotorEncoder[shoulderJoint]);
 		//servo[handJoint] = 180;
 
-		while (nMotorEncoder[shoulderJoint] > -4900){
+		while (nMotorEncoder[shoulderJoint] < 4900){
 			motor[shoulderJoint] = -30;
 		}
 		motor[shoulderJoint] = 0;
@@ -137,7 +137,7 @@ void fold_arm(bool isFold){
 		//motor[shoulderJoint] = -40;
 		//wait1Msec(900);
 		//writeDebugStreamLine("encoder is at 2: %d", nMotorEncoder[shoulderJoint]);
-		//return;
+		return;
 	}
 }
 
@@ -204,19 +204,6 @@ task main()
 			tempEncoder = currentEncoder;
 			writeDebugStreamLine("encoder reset to: %d", currentEncoder);
 		}
-
-		//if (joy2Btn(1) == 1){
-		//	// Sets the ramp servo to deploy
-		//	servo[ramp] = 0;
-		//}
-		//if (joy2Btn(3) == 1){
-		//	// Sets the ramp servo to retract
-		//	servo[ramp] = 255;
-		//}
-		//if (joy2Btn(1) != 1 && joy2Btn(3) != 1){
-		//	// Sets the ramp servo to stopped
-		//	servo[ramp] = 128;
-		//}
 
 		drive(cont1_left_yval, cont1_left_xval, maxVal);
 		shoulderMovement(cont1_right_yval);

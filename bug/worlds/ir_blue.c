@@ -1,5 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S2,     IRSEEKER,       sensorHiTechnicIRSeeker1200)
+#pragma config(Sensor, S2,     IRSEEKER,       sensorI2CCustom)
 #pragma config(Sensor, S3,     COMPASS,        sensorI2CHiTechnicCompass)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
@@ -28,6 +28,8 @@
 
 int COMPASS_ZERO;
 int CURRENT_HEADING;
+int SERVO_OPTIMAL_POS = 85; // This is the position at which the ir servo is at the correct angle
+														// for turning to score rings.
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -122,6 +124,88 @@ int orientOnCurrentHeading (int cH, int heading){
 	return 999;
 }
 
+int findIR (){
+
+	//
+	// This function moves the servo with the IRSensor on it to find the strongest signal from the IRBeacon.
+	// It returns the final position of the irServo.
+	//
+
+	//
+	// Determines the general direction of the IRBeacon, and then positions the servo
+	// at the lower limit of the 5 range (i.e. dir is on the edge of 5 and 6).
+	//
+	// 5 is straight ahead,
+	// 1-4 are to the left,
+	// 6-9 are to the right,
+	// and 0 is broken. (well not really, but it means it couldn't find a signal
+	//
+	servoChangeRate[irseekerServo] = 5;
+	int dir;
+	int prevdir;
+	dir = HTIRS2readACDir(IRSEEKER);
+	writeDebugStreamLine("dir: %d", dir);
+	prevdir = dir;
+	while (dir <= 5){
+		if ((ServoValue[irseekerServo] - 2) > 10){
+			servo[irseekerServo] = ServoValue[irseekerServo] - 2;
+			wait1Msec(50);
+			dir = HTIRS2readACDir(IRSEEKER);
+		}
+		else{
+			writeDebugStreamLine("servo tried to go too far toward 0");
+			break;
+		}
+		if (dir != prevdir){
+			prevdir = dir;
+			writeDebugStreamLine("dir: %d", dir);
+		}
+	}
+	while (dir > 5){
+		if ((ServoValue[irseekerServo] + 2) < 245){
+			servo[irseekerServo] = ServoValue[irseekerServo] + 2;
+			wait1Msec(50);
+			dir = HTIRS2readACDir(IRSEEKER);
+		}
+		else{
+			writeDebugStreamLine("servo tried to go too far toward 255");
+			break;
+		}
+		if (dir != prevdir){
+			prevdir = dir;
+			writeDebugStreamLine("dir: %d", dir);
+		}
+	}
+
+	//
+	// Fine tune using the signal strengths within each of the five sensors on the IRSensor
+	//
+	servoChangeRate[irseekerServo] = 1;
+	int acS1, acS2, acS3, acS4, acS5 = 0;
+	int maxSensor;
+	int maxServo;
+  HTIRS2readAllACStrength(IRSEEKER, acS1, acS2, acS3, acS4, acS5);
+
+  maxSensor = acS5;
+  maxServo = ServoValue[irseekerServo];
+  while (dir == 5){
+  	if ((ServoValue[irseekerServo] + 1) < 245){
+			servo[irseekerServo] = ServoValue[irseekerServo] + 1;
+			wait1Msec(20);
+			dir = HTIRS2readACDir(IRSEEKER);
+		}
+	 	HTIRS2readAllACStrength(IRSEEKER, acS1, acS2, acS3, acS4, acS5);
+
+	  if (acS5 > maxSensor){
+	  	maxSensor = acS5;
+	  	maxServo = ServoValue[irseekerServo];
+	  }
+	}
+	servo[irseekerServo] = maxServo;
+	writeDebugStreamLine("robot believes optimal position to be %d.", maxServo);
+	return maxServo;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //														Movement Functions
@@ -180,35 +264,13 @@ void move(int powerRight, int powerLeft, int duration){
 task main()
 {
 	waitForStart();
-
-	servo[irseekerServo] = 128;
 	wait1Msec(20);
+	int servoPosition;
 
 	// Drive forward slightly to clear rings
-	move(-50,-50,500);
+	// move(-50,-50,500);
 
 	// Find the IRBeacon with the IRSensor
 	// From here on, the code is specialized toward the middle and far pegs (for now...)
-
-	int dir;
-	dir = HTIRS2readACDir(IRSEEKER);
-	// 5 is straight ahead,
-	// 1-4 are to the left,
-	// 6-9 are to the right,
-	// and 0 is broken. (well not really, but it means it couldn't find a signal
-
-	while (dir < 5){
-		servo[irseekerServo] = ServoValue[irseekerServo] + 2;
-		dir = HTIRS2readACDir(IRSEEKER);
-	}
-	while (dir > 5){
-		servo[irseekerServo] = ServoValue[irseekerServo] - 2;
-		dir = HTIRS2readACDir(IRSEEKER);
-	}
-
-	int acs1, acs2, acs3, acs4, acs5 = 0;
-
-
-// !!! Unfinished code !!! Does not do anything !!!
-
+	servoPosition = findIR();
 }
