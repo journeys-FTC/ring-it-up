@@ -1,13 +1,13 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C2_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C2_1,     shoulderJoint, tmotorTetrix, openLoop, reversed, encoder)
 #pragma config(Motor,  mtr_S1_C2_2,     spear,         tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_1,     rightRear,     tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_2,     leftRear,      tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C3_1,     leftFrontPair, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     rightFrontPair, tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C4_1,     leftRear,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     rightRear,     tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C1_1,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C1_2,    servo2,               tServoNone)
+#pragma config(Servo,  srvo_S1_C1_2,    irseekerServo,        tServoStandard)
 #pragma config(Servo,  srvo_S1_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_5,    servo5,               tServoNone)
@@ -27,11 +27,17 @@
 //                       Variables                           //
 //***********************************************************//
 
-//int maxHandValue = 250;
-//int minHandValue = 50;
+int maxHandValue = 255;
+int minHandValue = 50;
 
-int currentEncoder = 0;
-int tempEncoder = 0;
+int scoringHand = 100;
+int packedHand = 205;
+
+int currentShoulderEncoder = 0;
+int tempShoulderEncoder = 0;
+
+int currentSpearEncoder = 0;
+int tempSpearEncoder = 0;
 
 //***********************************************************//
 //                         Methods                           //
@@ -43,8 +49,8 @@ void all_stop()
 	motor[leftRear] = 0;
 	motor[rightFrontPair] = 0;
 	motor[rightRear] = 0;
-//	motor[shoulderJoint] = 0;
-//	servo[ramp] = 128;
+	//motor[shoulderJoint] = 0;
+	//servo[ramp] = 128;
 }
 
 void drive(int ycord,int xcord, int maxVal)
@@ -52,74 +58,89 @@ void drive(int ycord,int xcord, int maxVal)
 	int turningVal = returnValueMotor(xcord, maxVal);
 	int motorVal = returnValueMotor(ycord, maxVal);
 
-	motor[leftRear] = motorVal + (2*turningVal);
-	motor[leftFrontPair] = motorVal + (2*turningVal);
+	motor[leftRear] = motorVal - (2*turningVal);
+	motor[leftFrontPair] = motorVal - (2*turningVal);
 
-	motor[rightRear] = motorVal - (2*turningVal);
-	motor[rightFrontPair] = motorVal - (2*turningVal);
+	motor[rightRear] = motorVal + (2*turningVal);
+	motor[rightFrontPair] = motorVal + (2*turningVal);
 }
 
 void spearMovement(int powerVal){
 
 	motor[spear] = powerVal;
 
-	currentEncoder = nMotorEncoder[spear];
-	if (currentEncoder != tempEncoder){
-		writeDebugStreamLine("encoder current value: %d", currentEncoder);
-		tempEncoder = currentEncoder;
+	currentSpearEncoder = nMotorEncoder[spear];
+	if (currentSpearEncoder != tempSpearEncoder){
+		writeDebugStreamLine("spear encoder current value: %d", currentSpearEncoder);
+		tempSpearEncoder = currentSpearEncoder;
 	}
 }
 
-//void shoulderMovement(int ycord)
-//{
-//	int maxVal = 40;
-//	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
-//	return;
-//}
+void shoulderMovement(int ycord)
+{
+	int maxVal = 40;
+	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
+	//currentShoulderEncoder = nMotorEncoder[shoulderJoint];
+	//if (currentShoulderEncoder != tempShoulderEncoder){
+	//	writeDebugStreamLine("shoulder encoder current value: %d", currentShoulderEncoder);
+	//	tempShoulderEncoder = currentShoulderEncoder;
+	//}
+	return;
+}
 
-//void handMovement(int dPad)
-//{
-//	int currentPosition = ServoValue[handJoint];
-//	int newPosition = currentPosition;
+void handMovement(int dPad)
+{
+	int currentPosition = ServoValue[handJoint];
+	int newPosition = currentPosition;
 
-//	if (dPad == 0)
-//	{
-//		if ((currentPosition + 5) < maxHandValue)
-//		{
-//			newPosition = currentPosition + 5;
-//		}
-//	}
-//	else if (dPad == 4)
-//	{
-//		if ((currentPosition - 5) > minHandValue)
-//		{
-//			newPosition = currentPosition - 5;
-//		}
-//	}
-//	servo[handJoint] = newPosition;
-//}
+	if (dPad == 0)
+	{
+		if ((currentPosition - 5) > minHandValue)
+		{
+			newPosition = currentPosition - 5;
+		}
+	}
+	else if (dPad == 4)
+	{
+		if ((currentPosition + 5) < maxHandValue)
+		{
+			newPosition = currentPosition + 5;
+		}
+	}
+	servo[handJoint] = newPosition;
+}
 
-//void fold_arm(bool isFold)
-//{
-//	all_stop();
-//	if (isFold)
-//	{
-//		motor[shoulderJoint] = 40;
-//		wait1Msec(1300);
-//		servo[handJoint] = 80;
-//		wait1Msec(350);
-//		return;
-//	}
-//	else
-//	{
-//		motor[shoulderJoint] = -40;
-//		wait1Msec(700);
-//		servo[handJoint] = 180;
-//		motor[shoulderJoint] = -40;
-//		wait1Msec(900);
-//		return;
-//	}
-//}
+void fold_arm(bool isFold){
+	// if isFold is true, the arm will return to folded position
+	// otherwise it will deploy to scoring position
+
+	all_stop();
+	if (isFold){
+		servo[handJoint] = packedHand;
+		while (nMotorEncoder[shoulderJoint] < -800){
+			motor[shoulderJoint] = 30;
+		}
+		motor[shoulderJoint] = 0;
+		writeDebugStreamLine("arm is folded at: %d", nMotorEncoder[shoulderJoint]);
+		return;
+	}
+	else{
+		while (nMotorEncoder[shoulderJoint] > -2300){
+			motor[shoulderJoint] = -30;
+		}
+		motor[shoulderJoint] = 0;
+		writeDebugStreamLine("arm is halfway at: %d", nMotorEncoder[shoulderJoint]);
+		servo[handJoint] = scoringHand;
+
+		while (nMotorEncoder[shoulderJoint] > -4900){
+			motor[shoulderJoint] = -30;
+		}
+		motor[shoulderJoint] = 0;
+		writeDebugStreamLine("arm is extended at: %d", nMotorEncoder[shoulderJoint]);
+
+		return;
+	}
+}
 
 //***********************************************************//
 //                      User Control                         //
@@ -130,9 +151,13 @@ task main()
 	waitForStart();
 	//servoChangeRate[handJoint] = 10;
 	nMotorEncoder[spear] = 0;
-	writeDebugStreamLine("encoder set to: %d", nMotorEncoder[spear]);
+	writeDebugStreamLine("spear encoder set to: %d", nMotorEncoder[spear]);
 
-	int maxVal = 40;
+	nMotorEncoder[shoulderJoint] = 0;
+	writeDebugStreamLine("shoulder encoder set to: %d", nMotorEncoder[shoulderJoint]);
+
+
+	int maxVal = 50;
 
 	while (true)
 	{
@@ -172,14 +197,14 @@ task main()
 			spearMovement(0);
 		}
 
-		//if (joy1Btn(6) == 1)
-		//{
-		//	fold_arm(false);
-		//}
-		//if (joy1Btn(5) == 1)
-		//{
-		//	fold_arm(true);
-		//}
+		if (joy1Btn(6) == 1)
+		{
+			fold_arm(false);
+		}
+		if (joy1Btn(5) == 1)
+		{
+			fold_arm(true);
+		}
 
 		if (joy1Btn(1) == 1){
 			maxVal = 100;
@@ -202,8 +227,21 @@ task main()
 		//	servo[ramp] = 128;
 		//}
 
+		if (joy1Btn(8) == 1){
+			//Button 8 resets the encoder value to 0
+			nMotorEncoder[shoulderJoint] = 0;
+			currentShoulderEncoder = nMotorEncoder[shoulderJoint];
+			tempShoulderEncoder = currentShoulderEncoder;
+			writeDebugStreamLine("encoder reset to: %d", currentShoulderEncoder);
+		}
+
+		if (joy1Btn(3) == 1){
+			//Button 3 will pack the IRSensor
+			servo[irseekerServo] = 250;
+		}
+
 		drive(cont1_left_yval, cont1_left_xval, maxVal);
-		//shoulderMovement(cont1_right_yval);
-		//handMovement(cont1_dPad);
+		shoulderMovement(cont1_right_yval);
+		handMovement(cont1_dPad);
 	}
 }
