@@ -5,8 +5,7 @@
 //
 ///////////////////////////////////////////////////////////////////
 
-void allStop()
-{
+void allStop(){
   motor[rightRear] = 0;
   motor[rightFrontPair] = 0;
   motor[leftRear] = 0;
@@ -14,8 +13,7 @@ void allStop()
   motor[shoulderJoint] = 0;
 }
 
-void moveStraight(int power, int duration)
-{
+void moveStraight(int power, int duration){
   motor[rightRear] = power;
   motor[rightFrontPair] = power;
   motor[leftRear] = power;
@@ -27,8 +25,7 @@ void moveStraight(int power, int duration)
   motor[leftFrontPair] = 0;
 }
 
-void move(int powerRight, int powerLeft, int duration)
-{
+void move(int powerRight, int powerLeft, int duration){
   motor[rightRear] = powerRight;
   motor[rightFrontPair] = powerRight;
   motor[leftRear] = powerLeft;
@@ -47,21 +44,29 @@ void setAllMotorVals (int power){
 	motor[leftRear] = power;
 }
 
-void movearm (int power, int duration)
-{
+void setDriveMotorVals (int powerRight, int powerLeft){
+	motor[rightRear] = powerRight;
+  motor[rightFrontPair] = powerRight;
+  motor[leftRear] = powerLeft;
+  motor[leftFrontPair] = powerLeft;
+}
+
+void movearm (int power, int duration){
 	motor[shoulderJoint] = power;
 	wait1Msec(duration);
 	motor[shoulderJoint] = 0;
 }
 
-void movehand(int position)
-{
+void movehand(int position){
 	servo[handJoint] = position;
 }
 
-void fold_arm(bool isFold, int packedHand, int scoringHand){
+void fold_arm(bool isFold){
 	// if isFold is true, the arm will return to folded position
 	// otherwise it will deploy to scoring position
+
+	int scoringHand = 100;
+	int packedHand = 205;
 
 	allStop();
 	if (isFold){
@@ -111,14 +116,14 @@ void deploySpear(bool isDeploy){
 
 	if (isDeploy){
 		motor[spear] = 20;
-		wait1Msec(4000);
+		wait1Msec(4500);
 		motor[spear] = 0;
 		return;
 	}
 
 	else{
 		motor[spear] = -20;
-		wait1Msec(4000);
+		wait1Msec(4200);
 		motor[spear] = 0;
 		return;
 	}

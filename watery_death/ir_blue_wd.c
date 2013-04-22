@@ -35,14 +35,10 @@ const tMUXSensor COMPASS = msensor_S2_4;
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int COMPASS_ZERO;
-int CURRENT_HEADING;
-int SERVO_OPTIMAL_POS = 95; // This is the position at which the ir servo is at the correct angle
+int SERVO_OPTIMAL_POS = 85; // This is the position at which the ir servo is at the correct angle
 														// for turning to score rings.
-int COMPASS_TURN_ANGLE = -45;
 
-int scoringHand = 100;
-int packedHand = 205;
+int servoValAfterIScan; // The value of the servo after the initial scan for direction
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -54,25 +50,10 @@ int packedHand = 205;
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int nOldHeading = 999;
-
 void initializeRobot()
 {
-	eraseDisplay();
-	int i = 0;
-  while (i < 400)
-  {
-    COMPASS_ZERO = SensorValue[COMPASS];
-    if (abs(COMPASS_ZERO - nOldHeading) > 1)
-    {
-      // Only update when changed to avoid LCD screen flicker
-      nxtDisplayCenteredTextLine(0, "%d", COMPASS_ZERO);
-      nOldHeading = COMPASS_ZERO;
-    }
-    i += 1;
-  }
+	HTMCsetTarget(COMPASS);
   nMotorEncoder[shoulderJoint] = 0;
-  //COMPASS_ZERO = SensorValue[compass];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,62 +62,6 @@ void initializeRobot()
 //
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int conversionHelper (int num){
-	//
-	// The idea for this function is that turning left or right requires subtracting or adding angles to the
-	// current heading respectively (i.e. to turn 90 degrees right, add 90 degrees to the current heading).
-	// With normal addition and subtraction, this causes issues as adding 1 to 359 becomes 0 as opposed to 360.
-	// This function serves to translate those numbers outside of the range 0-359 into numbers inside its range
-	// based on modular arithmetic.
-	//
-	// As an example, a -2 calculated angle would be processed into a 358 sensor value.
-	//
-
-	// num: the integer to be converted
-	// 360 is used as that is the range of values collected by the compass sensor
-	return (num%360);
-}
-
-int orientOnCurrentHeading (int cH, int heading){
-	//
-	// This function orients the value of cHeading to be 0, while those values to the left of it become
-	// negative, and those to the right become positive.
-	// It returns the value of "heading" in this orientation.
-	//
-
-	// cH: CURRENT_HEADING/the heading to be oriented around
-	// heading: the heading to orient on
-
-	if (cH <= 180){
-		if (heading <= cH){
-			return (-(cH-heading));
-		}
-		else{
-			if (heading <= (cH+180)){
-				return (heading - cH);
-			}
-			else{
-				return (-((360-heading)+cH));
-			}
-		}
-	}
-
-	else{
-		if ((heading <= cH) && (heading > conversionHelper(cH+180))){
-			return (-(cH-heading));
-		}
-		else{
-			if (heading > cH){
-				return (heading-cH);
-			}
-			else{
-				return ((360-cH)+heading);
-			}
-		}
-	}
-	return 999;
-}
 
 int findIR (){
 
@@ -200,6 +125,8 @@ int findIR (){
 		}
 	}
 
+	servoValAfterIScan = ServoValue[irseekerServo];
+
 	//
 	// Fine tune using the signal strengths within each of the five sensors on the IRSensor
 	//
@@ -207,24 +134,37 @@ int findIR (){
 	int acS1, acS2, acS3, acS4, acS5 = 0;
 	int maxSensor;
 	int maxServo;
-  HTIRS2readAllACStrength(IRSEEKER, acS1, acS2, acS3, acS4, acS5);
 
   maxSensor = acS5;
   maxServo = ServoValue[irseekerServo];
   while (dir == 5){
-  	if ((ServoValue[irseekerServo] + 1) < 245){
+
+    if (!HTIRS2readAllACStrength(IRSEEKER, acS1, acS2, acS3, acS4, acS5 ))
+      break; // I2C read error occurred
+
+    writeDebugStreamLine("strengths 1,2,3,4,5: %d, %d, %d, %d, %d", acS1, acS2, acS3, acS4, acS5);
+
+	 	//writeDebugStreamLine("strength: %d", acS5);
+
+	 	if (acS3 < (maxSensor-50)){
+	 		break;
+	 	}
+
+	  if (acS3 > maxSensor){
+	  	maxSensor = acS3;
+	  	maxServo = ServoValue[irseekerServo];
+	  }
+
+	  writeDebugStreamLine("maxSensor: %d", maxSensor);
+
+	  if ((ServoValue[irseekerServo] + 1) < 245){
 			servo[irseekerServo] = ServoValue[irseekerServo] + 1;
 			wait1Msec(20);
 			dir = HTIRS2readACDir(IRSEEKER);
 		}
-	 	HTIRS2readAllACStrength(IRSEEKER, acS1, acS2, acS3, acS4, acS5);
-
-	  if (acS5 > maxSensor){
-	  	maxSensor = acS5;
-	  	maxServo = ServoValue[irseekerServo];
-	  }
 	}
-	servo[irseekerServo] = maxServo;
+	servo[irseekerServo] = servoValAfterIScan;
+	wait1Msec(100);
 	writeDebugStreamLine("robot believes optimal position to be %d.", maxServo);
 	return maxServo;
 }
@@ -262,60 +202,38 @@ task main()
 {
 	waitForStart();
 	wait1Msec(20);
-	int servoPosition = -1;
+	servo[irseekerServo] = 100;
+	//servo[handJoint] = 240;
+	wait1Msec(100);
+	int currentServoPosition = -1;
 
 	//***** From here on, the code is specialized toward the middle and far pegs (for now...)
 
 	// Drive forward slightly to clear rings
 	moveStraight(50,1000);
 
-	// Find the IRBeacon with the IRSensor
-	servoPosition = findIR();
+	writeDebugStreamLine("Initial position for IRBeacon is: %d", HTIRS2readACDir(IRSEEKER));
 
-	while ((servoPosition < SERVO_OPTIMAL_POS + 5) && (servoPosition < SERVO_OPTIMAL_POS - 5)){
+
+	// Find the IRBeacon with the IRSensor
+	currentServoPosition = findIR();
+
+	while ((currentServoPosition < SERVO_OPTIMAL_POS + 3) && (currentServoPosition < SERVO_OPTIMAL_POS - 3)){
 		// Continue moving along a straight line while the servo and its optimal position are not the same
 
-		while (servoPosition < SERVO_OPTIMAL_POS){
+		while (currentServoPosition < SERVO_OPTIMAL_POS - 3){
 			// Move forward while the servo's position is less than optimal
-			moveStraight(20,7*servoPosition);
-			servoPosition = findIR();
+			moveStraight(-15,4*currentServoPosition);
+			currentServoPosition = findIR();
 		}
-		while (servoPosition > SERVO_OPTIMAL_POS){
+		while (currentServoPosition > SERVO_OPTIMAL_POS + 3){
 			// Move backward while the servo's position is more than optimal
-			moveStraight(-20,7*servoPosition);
-			servoPosition = findIR();
+			moveStraight(15,4*currentServoPosition);
+			currentServoPosition = findIR();
 		}
 	}
 
-	// Now that the servo is at the optimal position, turn the robot 45 degrees with the compass
-	int mGoalHeading = conversionHelper(CURRENT_HEADING + COMPASS_TURN_ANGLE);
-	int mCurrentHeading = SensorValue[COMPASS];
-
-	int vmCurrentHeading;
-	int vmGoalHeading = orientOnCurrentHeading(CURRENT_HEADING,mGoalHeading);
-
-	while ((orientOnCurrentHeading(mGoalHeading, mCurrentHeading) < 0) || (orientOnCurrentHeading(mGoalHeading, mCurrentHeading) > 10)){
-		nxtDisplayCenteredTextLine(0, "%d", mCurrentHeading);
-		vmCurrentHeading = orientOnCurrentHeading(CURRENT_HEADING,mCurrentHeading);
-
-		int mDuration = abs((vmGoalHeading-vmCurrentHeading)/5);
-		if (mDuration < 5){
-			mDuration = 5;
-		}
-
-		if (vmCurrentHeading > vmGoalHeading){
-			//turn left
-			move(-20,20,mDuration);
-		}
-		else if (vmCurrentHeading < vmGoalHeading){
-			//turn right
-			move(20,-20,mDuration);
-		}
-		else{
-			break;
-		}
-		mCurrentHeading = SensorValue[COMPASS];
-	}
+	// Turn 45 degrees
 
 	// Deploy the spear
 	deploySpear(true);
@@ -342,7 +260,7 @@ task main()
 	deploySpear(false);
 
 	// unfold arm
-	fold_arm(false, packedHand, scoringHand);
+	fold_arm(false);
 
 	// move forward a little
 	moveStraight(20,300);
@@ -357,6 +275,6 @@ task main()
 	moveStraight(-40,500);
 
 	// reset arm
-	fold_arm(true, packedHand, scoringHand);
+	fold_arm(true);
 
 }

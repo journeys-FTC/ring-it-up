@@ -412,7 +412,7 @@ task main()
 	deploySpear(false);
 
 	// unfold arm
-	fold_arm(false, packedHand, scoringHand);
+	fold_arm(false);
 
 	// move forward a little
 	moveStraight(20,300);
@@ -427,6 +427,6 @@ task main()
 	moveStraight(-40,500);
 
 	// reset arm
-	fold_arm(true, packedHand, scoringHand);
+	fold_arm(true);
 
 }
