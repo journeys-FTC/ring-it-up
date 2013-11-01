@@ -1,5 +1,4 @@
 #pragma config(Hubs,  S1, HTServo,  HTMotor,  HTMotor,  HTMotor)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     HTSMUX,         sensorI2CCustom)
 #pragma config(Sensor, S3,     ,               sensorHiTechnicTouchMux)
 #pragma config(Motor,  mtr_S1_C2_1,     shoulderJoint, tmotorTetrix, openLoop, reversed, encoder)
@@ -9,7 +8,7 @@
 #pragma config(Motor,  mtr_S1_C4_1,     rightRear,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     leftRear,      tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C1_1,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C1_2,    irseekerServo,        tServoStandard)
+#pragma config(Servo,  srvo_S1_C1_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_5,    servo5,               tServoNone)
@@ -192,18 +191,18 @@ task main()
 
 		if (isLeft){
 			if (counter1 > 500){
-				setDriveMotorVals(20,-20);
+				setDriveMotorVals(40,-40);
 			}
 			else{
-				setDriveMotorVals(15,-15);
+				setDriveMotorVals(20,-20);
 			}
 		}
 		else{
 			if (counter1 > 100){
-				setDriveMotorVals(-20,20);
+				setDriveMotorVals(-40,40);
 			}
 			else{
-				setDriveMotorVals(-15,15); // with long arm
+				setDriveMotorVals(-20,20); // with long arm
 			}
 		}
 		counter1 += 1;
@@ -227,8 +226,19 @@ task main()
 	// threshold, assume the robot is stuck on the edge of the wood and increase the power
 	int counter2 = 0;
 
-	//deploy the spear
-	deploySpear(true);
+	// Initial check of the touch sensor values. If a robot is pushed up against the spear,
+	// do not deploy it.
+	nButtonsMask = SensorValue[S3];
+
+	if (nButtonsMask & 0x01)
+		isTouch = true;
+	if (nButtonsMask & 0x02)
+		isTouch = true;
+
+	if (isTouch == false){
+		//deploy the spear
+		deploySpear(true);
+	}
 
 	while (isTouch == false){
 
@@ -291,11 +301,11 @@ task main()
 					writeDebugStreamLine("Case 2: went straight");
 
 					if (counter2 > 600){
-						setAllMotorVals(30);
+						setAllMotorVals(40);
 					}
 
 					else{
-						setAllMotorVals(20);
+						setAllMotorVals(30);
 					}
 				}
 				else{
@@ -396,7 +406,7 @@ task main()
 	fold_arm(true);
 
 	//retract spear
-	deploySpear(false);
+	//deploySpear(false);
 
 	while (true){
 		return;
