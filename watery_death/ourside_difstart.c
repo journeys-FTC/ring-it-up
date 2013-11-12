@@ -134,13 +134,7 @@ task main()
 	//
 	// Move to other side of field
 	//
-
-	moveStraight(50,600);
-	move(-50,50,650);
-	moveStraight(50,1300);
-	move(50,-50,350);
-	moveStraight(50,450);
-
+	moveStraight(50,500);
 	//
 	// Find the line
 	//
@@ -170,17 +164,17 @@ task main()
 
 	bool isLeft = true; // If this boolean is true, the 90 degree turn is toward the left
 
-	moveStraight(30,350);
+	moveStraight(30,200);
 	//moveStraight(15,1000); // with long arm
 
 	// Make a variable that counts the number of times through the loop. If it goes above a certain
 	// threshold, assume the robot is stuck on the edge of the wood and increase the power
 	int counter1 = 0;
 
-	while (LSvalNorm(left_light) < white_threshold){
+	while (LSvalNorm(middle_light) < white_threshold){
 
 		//!--Code for debugging
-		left_nrm = LSvalNorm(left_light);
+		middle_nrm = LSvalNorm(middle_light);
 		if (left_nrm != temp_left_nrm) {
 			writeDebugStreamLine("left light sensor value: %d", middle_nrm);
 			temp_left_nrm = left_nrm;
@@ -259,8 +253,8 @@ task main()
 
 				if (right_nrm > black_threshold){
 					// right sensor is white or gray
-					// turn left
-					writeDebugStreamLine("Case 1: turned left");
+					// turn right
+					writeDebugStreamLine("Case 1: turned right");
 
 					if (counter2 > 600){
 						setDriveMotorVals(30,0);
@@ -271,9 +265,9 @@ task main()
 				}
 				else{
 					// right sensor is black
-					// lost, so just turn left a lot
+					// lost, so just turn right a lot
 
-					setDriveMotorVals(-30,30);
+					setDriveMotorVals(30,-30);
 				}
 			}
 
@@ -298,9 +292,9 @@ task main()
 				else{
 					// middle sensor is gray
 					// assume right sensor is gray
-					// turn left
+					// turn right
 
-					writeDebugStreamLine("Case 3: turned left");
+					writeDebugStreamLine("Case 3: turned right");
 
 					if (counter2 > 600){
 						setDriveMotorVals(30,0);
@@ -318,9 +312,9 @@ task main()
 				// left sensor is white
 				// assume middle sensor is black
 				// assume the right sensor is black too
-				// turn right
+				// turn left
 
-				writeDebugStreamLine("Case 4: turned right");
+				writeDebugStreamLine("Case 4: turned left");
 
 				if (counter2 > 600){
 					setDriveMotorVals(0,30);
@@ -333,9 +327,9 @@ task main()
 				// left sensor is gray
 				// middle sensor is gray
 				// assume right sensor is black
-				// turn right
+				// turn left
 
-				writeDebugStreamLine("Case 5: turned right");
+				writeDebugStreamLine("Case 5: turned left");
 
 				if (counter2 > 600){
 					setDriveMotorVals(0,30);

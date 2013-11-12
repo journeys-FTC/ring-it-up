@@ -123,7 +123,7 @@ void deploySpear(bool isDeploy){
 
 	else{
 		motor[spear] = -20;
-		wait1Msec(4200);
+		wait1Msec(4000);
 		motor[spear] = 0;
 		return;
 	}

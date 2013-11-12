@@ -9,7 +9,7 @@
 #pragma config(Motor,  mtr_S1_C4_1,     rightRear,     tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     leftRear,      tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C1_1,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C1_2,    irseekerServo,        tServoStandard)
+#pragma config(Servo,  srvo_S1_C1_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C1_5,    servo5,               tServoNone)
@@ -24,7 +24,7 @@
 // This code makes the robot just go forward.
 //
 
-int time = 1000;
+int time = 5000;
 
 task main()
 {
