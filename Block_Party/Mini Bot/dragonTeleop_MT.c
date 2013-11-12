@@ -1,13 +1,13 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
-#pragma config(Servo,  srvo_S1_C4_2,    Ramp,                 tServoContinuousRotation)
+#pragma config(Motor,  mtr_S1_C1_1,     Left,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C2_2,     Lift,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     Flag,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     motorI,        tmotorTetrix, openLoop)
+#pragma config(Servo,  srvo_S1_C4_1,    Auto,                 tServoStandard)
+#pragma config(Servo,  srvo_S1_C4_2,    Hand,                 tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C4_5,    servo5,               tServoNone)
@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
-#include "..\includes\AvoidWierd.h"
+#include "AvoidWierd.h"
 
 //***********************************************************//
 //                       Variables                           //
@@ -35,12 +35,8 @@ int minHandValue = 20;
 //***********************************************************//
 void all_stop()
 {
-	motor[leftFrontPair] = 0;
-	motor[leftRear] = 0;
-	motor[rightFrontPair] = 0;
-	motor[rightRear] = 0;
-	motor[shoulderJoint] = 0;
-	servo[ramp] = 128;
+	motor[Left] = 0;
+	motor[Right] = 0;
 }
 void drive(int ycord,int xcord)
 {
@@ -48,11 +44,9 @@ void drive(int ycord,int xcord)
 	int turningVal = returnValueMotor(xcord, maxVal);
 	int motorVal = returnValueMotor(ycord, maxVal);
 
-	motor[leftRear] = motorVal - (2*turningVal);
-	motor[leftFrontPair] = motorVal - (2*turningVal);
+	motor[Left] = motorVal - (2*turningVal);
 
-	motor[rightRear] = motorVal + (2*turningVal);
-	motor[rightFrontPair] = motorVal + (2*turningVal);
+	motor[Right] = motorVal + (2*turningVal);
 }
 
 void shoulderMovement(int ycord)
@@ -60,21 +54,21 @@ void shoulderMovement(int ycord)
 	if (ycord > 0)
 	{
 		int maxVal = 50;
-		motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
+		motor[Arm] = returnValueMotor(ycord, maxVal);
 		return;
 	}
 
 	else
 	{
 		int maxVal = 50;
-		motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
+		motor[Arm] = returnValueMotor(ycord, maxVal);
 		return;
 	}
 }
 
 void handMovement(int dPad)
 {
-	int currentPosition = ServoValue[handJoint];
+	int currentPosition = ServoValue[Auto];
 	int newPosition = currentPosition;
 
 	if (dPad == 0)
@@ -91,29 +85,9 @@ void handMovement(int dPad)
 			newPosition = currentPosition - 1;
 		}
 	}
-	servo[handJoint] = newPosition;
+	servo[Auto] = newPosition;
 }
-void fold_arm(bool isDown)
-{
-	//all_stop();
-	if (isDown)
-	{
-		motor[shoulderJoint] = 40;
-		wait1Msec(1300);
-		servo[handJoint] = 260;
-		wait1Msec(350);
-		return;
-	}
-	else
-	{
-		motor[shoulderJoint] = -40;
-		wait1Msec(700);
-		servo[handJoint] = 100;
-		motor[shoulderJoint] = -40;
-		wait1Msec(900);
-		return;
-	}
-}
+
 
 
 //***********************************************************//
@@ -136,35 +110,21 @@ task main()
 		shoulderMovement(cont1_right_yval);
 		handMovement(cont1_dPad);
 
-		if (joy1Btn(4) == 1)
+		if (joy1Btn(5) ==1)
 		{
-			servoChangeRate[handJoint] = 10;
-			servo[handJoint] = ServoValue[handJoint] + 5;
+			motor[Flag] = 70;
 		}
-		if (joy1Btn(2) == 1)
+		if (joy1Btn(7) == 1)
 		{
-			servoChangeRate[handJoint] = 10;
-			servo[handJoint] = ServoValue[handJoint] - 5;
+			motor[Flag] = -70;
 		}
-		if (joy2Btn(6) == 1)
+		if (joy2Btn(4) == 1)
 		{
-			servo[Ramp] = 0;
+			motor[Lift] = 70;
 		}
-		if (joy2Btn(8) == 1)
+		if (joy1Btn(3) == 1)
 		{
-			servo[Ramp] = 255;
-		}
-		if (joy2Btn(6) != 1 && joy2Btn(8) != 1)
-		{
-			servo[Ramp] = 128;
-		}
-		if (joy1Btn(6) == 1)
-		{
-			fold_arm(false);
-		}
-		if (joy1Btn(5) == 1)
-		{
-			fold_arm(true);
+			motor[Lift] = -70;
 		}
 	}
 }

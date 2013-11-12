@@ -2,10 +2,10 @@
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     shoulderJoint, tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     ramp,          tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop, reversed)
-#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     rightFrontPair, tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     leftFrontPair, tmotorTetrix, openLoop, reversed)
+#pragma config(Motor,  mtr_S1_C3_1,     rightRear,     tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     leftRear,      tmotorTetrix, openLoop, reversed)
 #pragma config(Servo,  srvo_S1_C4_1,    handJoint,            tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_2,    Ramp,                 tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C4_3,    servo3,               tServoNone)
@@ -42,34 +42,23 @@ void all_stop()
 	motor[shoulderJoint] = 0;
 	servo[ramp] = 128;
 }
-void drive(int ycord,int xcord)
+void drive(int ycord,int xcord,int maxVal)
 {
-	int maxVal = 40;
 	int turningVal = returnValueMotor(xcord, maxVal);
 	int motorVal = returnValueMotor(ycord, maxVal);
 
-	motor[leftRear] = motorVal - (2*turningVal);
-	motor[leftFrontPair] = motorVal - (2*turningVal);
+	motor[leftRear] = motorVal + (2*turningVal);
+	motor[leftFrontPair] = motorVal + (2*turningVal);
 
-	motor[rightRear] = motorVal + (2*turningVal);
-	motor[rightFrontPair] = motorVal + (2*turningVal);
+	motor[rightRear] = motorVal - (2*turningVal);
+	motor[rightFrontPair] = motorVal - (2*turningVal);
 }
 
 void shoulderMovement(int ycord)
 {
-	if (ycord > 0)
-	{
-		int maxVal = 50;
-		motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
-		return;
-	}
-
-	else
-	{
-		int maxVal = 50;
-		motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
-		return;
-	}
+	int maxVal = 40;
+	motor[shoulderJoint] = returnValueMotor(ycord, maxVal);
+	return;
 }
 
 void handMovement(int dPad)
@@ -115,6 +104,14 @@ void fold_arm(bool isDown)
 	}
 }
 
+void deploy_ramp(int ycord)
+{
+	int maxVal = 80;
+	motor[ramp] = returnValueMotor(ycord, maxVal);
+	return;
+
+}
+
 
 //***********************************************************//
 //                      User Control                         //
@@ -123,6 +120,7 @@ void fold_arm(bool isDown)
 task main()
 {
 	waitForStart();
+	int maxVal = 40;
 
 	while (true)
 	{
@@ -130,11 +128,13 @@ task main()
 		int cont1_left_yval = avoidWeird(joystick.joy1_y1, 20); //y coordinate for the left joystick on controller 1
 		int cont1_left_xval = avoidWeird(joystick.joy1_x1, 75); //x coordinate for the left joystick on controller 1
 		int cont1_right_yval = avoidWeird(joystick.joy1_y2, 20);
+		int cont2_left_yval = avoidWeird(joystick.joy2_y1, 20); //y coordinate for left joystick on controller 2
 		int cont1_dPad = joystick.joy1_TopHat; //Value of the dPad for controller 2
 
-		drive(cont1_left_yval, cont1_left_xval);
+		drive(cont1_left_yval, cont1_left_xval, maxVal);
 		shoulderMovement(cont1_right_yval);
 		handMovement(cont1_dPad);
+		deploy_ramp(cont2_left_yval);
 
 		if (joy1Btn(4) == 1)
 		{
@@ -165,6 +165,15 @@ task main()
 		if (joy1Btn(5) == 1)
 		{
 			fold_arm(true);
+		}
+		if (joy1Btn(1) == 1)
+		{
+			maxVal = 100;
+		}
+
+		if (joy1Btn(1) != 1)
+		{
+			maxVal = 40;
 		}
 	}
 }

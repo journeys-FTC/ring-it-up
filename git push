@@ -1,0 +1,41 @@
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+error: Couldn't resolve host 'github.com' while accessing https://github.com/journeys-FTC/ring-it-up.git/info/refs?service=git-receive-pack
+fatal: HTTP request failed
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+error: Couldn't resolve host 'github.com' while accessing https://github.com/journeys-FTC/ring-it-up.git/info/refs?service=git-receive-pack
+fatal: HTTP request failed
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+error: Couldn't resolve host 'github.com' while accessing https://github.com/journeys-FTC/ring-it-up.git/info/refs?service=git-upload-pack
+fatal: HTTP request failed
+#	new file:   dragon/backward_teleop.c
+#	modified:   dragon/dragonTeleop_MT.c
+#
