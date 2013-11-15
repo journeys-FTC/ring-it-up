@@ -165,7 +165,7 @@ task main()
 		moveStraight (-50,350);
 		move (50,-50,600);
 		moveStraight (-50,1300);
-		move (50,-50,800);
-		moveStraight (-50,1800);
+		move (50,-50,1000);
+		moveStraight (-50,2000);
 	}
 }
