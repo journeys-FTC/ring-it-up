@@ -1,4 +1,5 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  motorA,          Hand,          tmotorNXT, PIDControl, encoder)
 #pragma config(Motor,  motorB,           ,             tmotorNXT, openLoop)
 #pragma config(Motor,  motorC,           ,             tmotorNXT, openLoop)
@@ -123,6 +124,7 @@ task main()
 		if (joy2Btn(6) ==1)
 		{
 			motor[Flag] = 0;
+			motor[Lift] = 0;
 		}
 		if (joy2Btn(4) == 1)
 		{
@@ -134,7 +136,11 @@ task main()
 		}
 		if (joy2Btn(2) ==1)
 		{
-			motor[Lift] = 0;
+			servo[Hand] = 180
+		}
+		if (joy2Btn(1) ==1)
+		{
+			servo[Hand] = 10
 		}
 	}
 }
