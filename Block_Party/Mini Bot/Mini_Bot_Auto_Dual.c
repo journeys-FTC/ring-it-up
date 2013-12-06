@@ -59,6 +59,10 @@ int find_ir(int i){
 	bool stops = false;
 	while (!stops)
 	{
+		wait10Msec(100);
+		move (-50,10,300);
+		moveStraight (-50,300);
+		move (50,-10,300);
 		if(SensorValue[IRSeeker]==5 )
 		{
 			if(i<23)
@@ -74,7 +78,7 @@ int find_ir(int i){
 			{
 				hand (60);
 				moveStraight (-50,100);
-				wait10Msec(40);
+				wait10Msec(10);
 				hand(180);
 				stops = true;
 			}
@@ -108,7 +112,7 @@ void move_past_buckets(int i){
 		move (50,-50,600);
 		moveStraight (-50,1100);
 		move (50,-50,700);
-		moveStraight (-50,1900);
+		moveStraight (-50,1600);
 	}
 
 }

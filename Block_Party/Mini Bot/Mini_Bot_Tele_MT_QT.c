@@ -4,8 +4,8 @@
 #pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     Flag,          tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C3_1,    Auto,            tServoNone)
-#pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
+#pragma config(Servo,  srvo_S1_C3_1,    Auto,                 tServoStandard)
+#pragma config(Servo,  srvo_S1_C3_2,    Hand,                 tServoContinuousRotation)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_5,    servo5,               tServoNone)
@@ -114,6 +114,21 @@ task main()
 			motor[Flag] = 0;
 		if (joy1Btn(7) == 1)
 			motor[Flag] = -70;
-
+		if (joy1Btn(1) == 1)
+		{
+			servo[Hand] = 0;
+		}
+		if (joy1Btn(3) == 1)
+		{
+			servo[Hand] = 255;
+		}
+		//if (joy1Btn(1) != 1 && joy2Btn(3) != 1)
+		//{
+			//servo[Hand] = 128;
+		//}
+		if (joy1Btn(4) ==1)
+		{
+			servo[Hand] = 128;
+		}
 	}
 }
