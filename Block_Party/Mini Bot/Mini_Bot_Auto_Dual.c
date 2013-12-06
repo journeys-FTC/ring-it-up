@@ -1,12 +1,10 @@
-#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
 #pragma config(Motor,  mtr_S1_C1_1,     Left,          tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     Lift,          tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_1,     Hand,          tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_2,     motorI,        tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C3_1,    Auto_Hand,            tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -61,6 +59,10 @@ int find_ir(int i){
 	bool stops = false;
 	while (!stops)
 	{
+		wait10Msec(100);
+		move (-50,10,300);
+		moveStraight (-50,300);
+		move (50,-10,300);
 		if(SensorValue[IRSeeker]==5 )
 		{
 			if(i<23)
@@ -76,7 +78,7 @@ int find_ir(int i){
 			{
 				hand (60);
 				moveStraight (-50,100);
-				wait10Msec(40);
+				wait10Msec(10);
 				hand(180);
 				stops = true;
 			}
@@ -110,7 +112,7 @@ void move_past_buckets(int i){
 		move (50,-50,600);
 		moveStraight (-50,1100);
 		move (50,-50,700);
-		moveStraight (-50,1900);
+		moveStraight (-50,1600);
 	}
 
 }

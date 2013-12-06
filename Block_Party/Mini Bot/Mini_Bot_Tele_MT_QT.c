@@ -4,10 +4,15 @@
 #pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     Flag,          tmotorTetrix, openLoop)
+<<<<<<< HEAD
 #pragma config(Motor,  mtr_S1_C4_1,     Hand,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_2,     motorI,        tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C3_1,    Auto,                 tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
+=======
+#pragma config(Servo,  srvo_S1_C3_1,    Auto,                 tServoStandard)
+#pragma config(Servo,  srvo_S1_C3_2,    Hand,                 tServoContinuousRotation)
+>>>>>>> 419b1e81ab9cae93a88f88b34851f9dac7224002
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_5,    servo5,               tServoNone)
@@ -116,6 +121,7 @@ task main()
 			motor[Flag] = 0;
 		if (joy1Btn(7) == 1)
 			motor[Flag] = -70;
+<<<<<<< HEAD
 		if (joy1Btn(4) ==1)
 		{
 			motor[Hand] = 30;
@@ -130,5 +136,23 @@ task main()
 		}
 
 
+=======
+		if (joy1Btn(1) == 1)
+		{
+			servo[Hand] = 0;
+		}
+		if (joy1Btn(3) == 1)
+		{
+			servo[Hand] = 255;
+		}
+		//if (joy1Btn(1) != 1 && joy2Btn(3) != 1)
+		//{
+			//servo[Hand] = 128;
+		//}
+		if (joy1Btn(4) ==1)
+		{
+			servo[Hand] = 128;
+		}
+>>>>>>> 419b1e81ab9cae93a88f88b34851f9dac7224002
 	}
 }
