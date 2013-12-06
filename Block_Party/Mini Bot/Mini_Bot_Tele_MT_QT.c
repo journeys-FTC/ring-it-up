@@ -1,10 +1,12 @@
-#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  none)
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     Left,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C2_2,     Flag,          tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S1_C3_1,    Auto,            tServoNone)
+#pragma config(Motor,  mtr_S1_C4_1,     Hand,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     motorI,        tmotorTetrix, openLoop)
+#pragma config(Servo,  srvo_S1_C3_1,    Auto,                 tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_4,    servo4,               tServoNone)
@@ -114,6 +116,19 @@ task main()
 			motor[Flag] = 0;
 		if (joy1Btn(7) == 1)
 			motor[Flag] = -70;
+		if (joy1Btn(4) ==1)
+		{
+			motor[Hand] = 30;
+			wait1Msec(50);
+			motor[Hand] = 0;
+		}
+		if (joy1Btn(2) ==1)
+		{
+			motor[Hand] = -30;
+			wait1Msec(50);
+			motor[Hand] = 0;
+		}
+
 
 	}
 }
