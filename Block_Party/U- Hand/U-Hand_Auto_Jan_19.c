@@ -1,10 +1,12 @@
-#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  none)
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTServo,  HTMotor)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     IRSeeker,       sensorHiTechnicIRSeeker1200)
 #pragma config(Motor,  mtr_S1_C1_1,     Left,          tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C1_2,     Right,         tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_1,     Arm,           tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     Lift,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     Flag,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     Arm,           tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_1,     Hand,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     Lift,          tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C3_1,    Auto_Hand,            tServoStandard)
 #pragma config(Servo,  srvo_S1_C3_2,    servo2,               tServoNone)
 #pragma config(Servo,  srvo_S1_C3_3,    servo3,               tServoNone)
@@ -25,7 +27,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "JoystickDriver.c"  //Include file to "handle" the Bluetooth messages.
-#include "Movement_To_Deposit.h"//Runs the program to find the ir and drop the block
 
 int r;
 int z;
@@ -83,18 +84,18 @@ int time(){
 
 
 void position(){
-	nxtDisplayTextLine(1, "L_ARROW = FLAG FRIST");
-	nxtDisplayTextLine(2, "R_ARROW = ARM FIRST");
-	nxtDisplayTextLine(5, "WHICH COLOR?");
+	nxtDisplayTextLine(1, "L_ARROW = ARM FRIST");
+	nxtDisplayTextLine(2, "R_ARROW = HAND FIRST");
+	nxtDisplayTextLine(5, "WHICH SIDE?");
 	bool select = false;
 	while(!select){
 		if(nNxtButtonPressed == 2){         //Left orange is button 2
 			wait10Msec(50);
-			r = +1;
+			r = -1;
 			select = true;
 			}else if(nNxtButtonPressed == 1){    // Right orange is button 1
 			wait10Msec(50);
-			r = -1;
+			r = +1;
 			select = true;
 		}
 	}
@@ -102,7 +103,37 @@ void position(){
 	eraseDisplay();
 	nxtDisplayCenteredBigTextLine(4, "READY!");
 }
+int find_ir(int i){
+	bool stops = false;
+	while (!stops)
+	{
+		if(SensorValue[IRSeeker]==5 )
+		{
+			if(i<23)
+			{
+				moveStraight (r*50,50);
+				hand(60);
+				moveStraight (r*50,100);
+				wait10Msec(20);
+				hand(180);
+				stops = true;
+			}
+			else
+			{
+				hand (60);
+				moveStraight (r*50,100);
+				wait10Msec(20);
+				hand(180);
+				stops = true;
+			}
+		}
+		else
+			moveStraight (r*30,100);
+		i= i+1;
+	}
 
+	return i;
+}
 
 void move_past_buckets(int i){
 	//	string temp = i;
@@ -121,11 +152,11 @@ void move_past_buckets(int i){
 		n= n+1;
 	}
 	{
-		moveStraight (r*50,350);
+		moveStraight (r*50,465);
 		move (z*50,r*50,600);
-		moveStraight (r*50,1100);
-		move (z*50,r*50,1000);
-		moveStraight (r*50,1900);
+		moveStraight (r*50,1150);
+		move (z*50,r*50,700);
+		moveStraight (r*50,1700);
 	}
 
 }
